@@ -5,7 +5,7 @@ local version = "1.0.0"
 local author = "dracahn"
 
 local wasOpen = false
-local oncePerQuestVar = false
+local spawnVar = false
 local startCombatHolder = false
 local drawHolder = false
 local doOnce = true
@@ -75,9 +75,9 @@ local itemList = {
 ]]
 
 local foodList = {
-    -- [itemId] = {itemId, title, type, effectId, {{buffFieldName, buffFieldValue}, .. }}
+    -- [itemId] = {title, types, effectId, {{buffFieldName, buffFieldValue}, .. }}
 	[1] = {"Demondrug", {0}, 110, {{"_AtkUpAlive", "_DemondrugAtkUp", nil}}},
-	[2] = {"Mega Demondrug", 0, 110, {{"_AtkUpAlive", "_GreatDemondrugAtkUp", nil}}},
+	[2] = {"Mega Demondrug", {0}, 110, {{"_AtkUpAlive", "_GreatDemondrugAtkUp", nil}}},
 	[3] = {"Armorskin", {0}, 110, {{"_DefUpAlive", "_ArmorSkinDefUp", nil}}},
 	[4] = {"Mega Armorskin", {0}, 110, {{"_DefUpAlive" , "_GreatArmorSkinDefUp", nil}}},
 	[5] = {"Might Seed", {0}, 110, {{"_AtkUpBuffSecond", "_MightSeedAtkUp", nil}, {"_AtkUpBuffSecondTimer", "_MightSeedTimer", 60}}},
@@ -138,11 +138,12 @@ re.on_draw_ui(function()
         end
 
         if imgui.tree_node("Debug Info (send a screenshot of this info along with the bug report)") then
-            if imgui.button("Toggle oncePerQuestVar") then
-                oncePerQuestVar = not oncePerQuestVar
+            if imgui.button("Toggle spawnVar") then
+                spawnVar = not spawnVar
             end
             imgui.text("userChoices obj: " .. json.dump_string(settings.data.userChoices))
-            imgui.text("oncePerQuestVar: " .. tostring(oncePerQuestVar))
+            imgui.text("spawnVar: " .. tostring(spawnVar))
+            imgui.text("death: " .. tostring(death))
             imgui.text("dataDump:")
             imgui.text(json.dump_string(dbg))
             imgui.text(json.dump_string(dmp))
@@ -340,15 +341,21 @@ local function AutoConsume()
         if (isWeaponSheathed) then
             drawHolder = true
         elseif drawHolder then
-            if (death) then death = false end -- turn the death flag off if you draw your weapon
+            if (death) then 
+                death = false 
+                spawnVar = true
+            end -- turn the death flag off if you draw your weapon
             drawHolder = false
             activateLevel = 4
         end
 
         -- determine 'start of combat'
         if (inBattle) then -- if we're in battle
-            if (death) then death = false end -- turn the death flag off once you get back in combat
             if (startCombatHolder) then -- if we have not activated the 'start of combat' items 
+                if (death) then 
+                    death = false 
+                    spawnVar = true
+                end -- turn the death flag off once you get back in combat
                 activateLevel = 3 -- set actiavet level to 3
                 startCombatHolder = false -- mark that we have activated the 'start of combat' items
             end
@@ -357,9 +364,9 @@ local function AutoConsume()
         end
 
         -- determine 'once per quest'
-        if (oncePerQuestVar) then -- if we have not activated the once per quest items
+        if (spawnVar and not death) then -- if we have not activated the once per quest items
             activateLevel = 2  -- set the activate level to 2
-            oncePerQuestVar = false -- mark that we have activate the 'once per quest' items
+            spawnVar = false -- mark that we have activate the 'once per quest' items
         end -- else we've already activated the 'once per quest' items
 
 
@@ -390,7 +397,7 @@ local function AutoConsume()
             chatManager:call("reqAddChatInfomation", message, 2289944406);
         end
     else -- reset the quest var
-        oncePerQuestVar = true
+        spawnVar = true
     end
 end
 
@@ -422,7 +429,7 @@ end)
 
 sdk.hook(sdk.find_type_definition("snow.QuestManager"):get_method("onQuestEnd"),
 function(args)
-	oncePerQuestVar = true;
+	spawnVar = true;
 end,
 function(retval)
 	return retval
@@ -432,7 +439,6 @@ end
 sdk.hook(sdk.find_type_definition("snow.QuestManager"):get_method("notifyDeath"),
 function(args)
 	death = true;
-	oncePerQuestVar = true;
 end,
 function(retval)
 	return retval
@@ -507,14 +513,14 @@ end
             modUI.Label("1 = off");
             modUI.Label("2 = On Quest Start/respawn");
             modUI.Label("3 = On Combat Start");
-            modUI.Label("4 = On Weapon Draw (not yet implemented)");
+            modUI.Label("4 = On Weapon Draw");
             modUI.Label("5 = Always");
             modUI.Header("Items");
             for key,value in pairs(foodList) do
                 local foodKey = key
                 local effectName = value[1]
                 local changed;
-                changed, settings.data.userChoices[foodKey] = modUI.Slider(effectName, settings.data.userChoices[foodKey], 1, 4, "1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
+                changed, settings.data.userChoices[foodKey] = modUI.Slider(effectName, settings.data.userChoices[foodKey], 1, 5, "1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
                 settings.handleChange(changed, settings.data.userChoices, "userChoices")
             end
             
