@@ -86,7 +86,7 @@ local foodList = {
 	[8] = {"Hardshell Powder", {0}, 110, {{"_DefUpItemSecond", "_ArmorSkinPowderDefUp", nil}, {"_DefUpItemSecondTimer", "_ArmorSkinPowderTimer", 60}}},
 	[10] = {"Gourmet Fish", {0}, 100, {{"_FishRegeneEnableTimer", "_WellDoneFishEnableTimer", 60}}},
 	[11] = {"Immunizer", {0}, 102, {{"_VitalizerTimer", "_VitalizerTimer", 60}}},
-	[9] = {"Dash Juice", {0, 3}, 102, {{"_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 3}}},
+	[9] = {"Dash Juice", {0, 3}, 102, {{"_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 60}}},
 
     [12] = {"Whetstone", {1}, -1},
     [13] = {"Max Potion", {2}, 100},
