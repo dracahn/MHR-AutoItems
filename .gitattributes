@@ -3,3 +3,7 @@
 LICENSE export-ignore
 README.md export-ignore
 \media\* export-ignore
+\media export-ignore
+/media export-ignore
+*.jpg export-ignore
+*.png export-ignore
