@@ -2,4 +2,4 @@
 .gitignore export-ignore
 LICENSE export-ignore
 README.md export-ignore
-/media/* export-ignorw
+\media\* export-ignore
