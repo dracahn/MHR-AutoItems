@@ -2,7 +2,6 @@ local modName = "AutoItems"
 local version = "1.0.0"
 local author = "dracahn"
 
-local wasOpen = false
 local spawnVar = false
 local startCombatHolder = false
 local drawHolder = false
@@ -29,7 +28,9 @@ modUtils.info("Does the same as above, but puts [MODUTILS] at the beginning of t
 
 local settings = modUtils.getConfigHandler({
     enabled = true,
+    offlineOnly = false,
     message = true,
+    consumeItems = false,
     isWindowOpen = true,
     userChoices = {},
     language = {
@@ -41,24 +42,6 @@ local settings = modUtils.getConfigHandler({
 -- Load the languages
 language.init(settings)
 
-local itemList = {
-	[1] = 68157917,
-	[2] = 68157918,
-	[3] = 68157922,
-	[4] = 68157923,
-	[5] = 68157919,
-	[6] = 68157920,
-	[7] = 68157924,
-	[8] = 68157925,
-	[9] = 68157913,
-	[10] = 68157909,
-	[11] = 68157911,
-
-    [12] = 68157450,
-    [13] = 68157450,
-    [14] = 68157450,
-}
-
 --[[ item types:
     0 = apply all buff fields
     1 = sharpen
@@ -68,101 +51,32 @@ local itemList = {
 
 local foodList = {
     -- [itemId] = {title, types, effectId, {{buffFieldName, buffFieldValue}, .. }}
-	[1] = {"Demondrug", {0}, 110, {{"_AtkUpAlive", "_DemondrugAtkUp", nil}}},
-	[2] = {"MegaDemondrug", {0}, 110, {{"_AtkUpAlive", "_GreatDemondrugAtkUp", nil}}},
-	[3] = {"Armorskin", {0}, 110, {{"_DefUpAlive", "_ArmorSkinDefUp", nil}}},
-	[4] = {"MegaArmorskin", {0}, 110, {{"_DefUpAlive" , "_GreatArmorSkinDefUp", nil}}},
-	[5] = {"MightSeed", {0}, 110, {{"_AtkUpBuffSecond", "_MightSeedAtkUp", nil}, {"_AtkUpBuffSecondTimer", "_MightSeedTimer", 60}}},
-	[6] = {"DemonPowder", {0}, 110, {{"_AtkUpItemSecond", "_DemondrugPowderAtkUp", nil}, {"_AtkUpItemSecondTimer", "_DemondrugPowderTimer", 60}}},
-	[7] = {"AdamantSeed", {0}, 110, {{"_DefUpBuffSecond", "_AdamantSeedDefUp", nil}, {"_DefUpBuffSecondTimer", "_AdamantSeedTimer", 60}}},
-	[8] = {"HardshellPowder", {0}, 110, {{"_DefUpItemSecond", "_ArmorSkinPowderDefUp", nil}, {"_DefUpItemSecondTimer", "_ArmorSkinPowderTimer", 60}}},
-	[10] = {"GourmetFish", {0}, 100, {{"_FishRegeneEnableTimer", "_WellDoneFishEnableTimer", 60}}},
-	[11] = {"Immunizer", {0}, 102, {{"_VitalizerTimer", "_VitalizerTimer", 60}}},
-	[9] = {"DashJuice", {0, 3}, 102, {{"_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 60}}},
+	[1] = {68157917, "Demondrug", {0}, 110, {{"_AtkUpAlive", "_DemondrugAtkUp", nil}}},
+	[2] = {68157918, "MegaDemondrug", {0}, 110, {{"_AtkUpAlive", "_GreatDemondrugAtkUp", nil}}},
+	[3] = {68157922, "Armorskin", {0}, 110, {{"_DefUpAlive", "_ArmorSkinDefUp", nil}}},
+	[4] = {68157923, "MegaArmorskin", {0}, 110, {{"_DefUpAlive" , "_GreatArmorSkinDefUp", nil}}},
+	[5] = {68157919, "MightSeed", {0}, 110, {{"_AtkUpBuffSecond", "_MightSeedAtkUp", nil}, {"_AtkUpBuffSecondTimer", "_MightSeedTimer", 60}}},
+	[6] = {68157920, "DemonPowder", {0}, 110, {{"_AtkUpItemSecond", "_DemondrugPowderAtkUp", nil}, {"_AtkUpItemSecondTimer", "_DemondrugPowderTimer", 60}}},
+	[7] = {68157924, "AdamantSeed", {0}, 110, {{"_DefUpBuffSecond", "_AdamantSeedDefUp", nil}, {"_DefUpBuffSecondTimer", "_AdamantSeedTimer", 60}}},
+	[8] = {68157925, "HardshellPowder", {0}, 110, {{"_DefUpItemSecond", "_ArmorSkinPowderDefUp", nil}, {"_DefUpItemSecondTimer", "_ArmorSkinPowderTimer", 60}}},
+	[10] = {68157909, "GourmetFish", {0}, 100, {{"_FishRegeneEnableTimer", "_WellDoneFishEnableTimer", 60}}},
+	[11] = {68157911, "Immunizer", {0}, 102, {{"_VitalizerTimer", "_VitalizerTimer", 60}}},
+	[9] = {68157913, "DashJuice", {0, 3}, 102, {{"_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 60}}},
 
-    [12] = {"Whetstone", {1}, -1},
-    [13] = {"MaxPotion", {2}, 100},
-    [14] = {"Ration", {3}, -1},
+    [12] = {0, "Whetstone", {1}, -1},
+    [13] = {68157445, "MaxPotion", {2}, 100},
+    [14] = {68157912, "Ration", {3}, -1},
 }
 local polishTime = {30, 60, 90}
 local itemProlongerMultipliers = {1, 1.1, 1.25, 1.5}
 
 for key,value in pairs(foodList) do
     local foodKey = key
-    local itemName = value[1]
-    log.debug(tostring(foodKey))
-    log.debug(tostring(itemName))
+    local itemName = value[2]
+    --log.debug(tostring(foodKey))
+    --log.debug(tostring(itemName))
     if (settings.data.userChoices[foodKey] == nil) then settings.data.userChoices[foodKey] = 1 end -- default settings to 1
 end
-
-re.on_draw_ui(function()
-    if imgui.button(language.get("window.toggle")) then
-        settings.data.isWindowOpen = not settings.data.isWindowOpen
-        settings.handleChange(true, settings.data.isWindowOpen, "isWindowOpen")
-    end
-    if settings.data.isWindowOpen then
-        wasOpen = true
-
-        imgui.set_next_window_size(Vector2f.new(520, 450), 4)
-
-        settings.data.isWindowOpen = imgui.begin_window(modName, settings.data.isWindowOpen, 0)
-
-        imgui.spacing()
-        local langChange, newVal = imgui.combo(language.get("enabled"), settings.data.language.current, langList)
-        settings.data.language.current = langList[newVal]
-        settings.handleChange(langChange, settings.data.language, "language")
-        imgui.spacing()
-        imgui.text(language.get("disclaimer"))
-        imgui.spacing()
-        local changedEnabled, toggleEnabled = imgui.checkbox(language.get("enabled"), settings.data.enabled)
-        settings.handleChange(changedEnabled, toggleEnabled, "enabled")
-        local changedOfflineOnly, toggleOfflineOnly = imgui.checkbox(language.get("offlineOnly"), settings.data.offlineOnly)
-        settings.handleChange(changedOfflineOnly, toggleOfflineOnly, "offlineOnly")
-        local changedMessage, toggleMessage = imgui.checkbox(language.get("message"), settings.data.message)
-        settings.handleChange(changedMessage, toggleMessage, "message")
-        imgui.spacing()
-        local changedRequireItems, toggleRequireItems = imgui.checkbox(language.get("requireItems"), settings.data.requireItems)
-        settings.handleChange(changedRequireItems, toggleRequireItems, "requireItems")
-        local changedConsumeItems, toggleConsumeItems = imgui.checkbox(language.get("consumeItems"), settings.data.consumeItems)
-        settings.handleChange(changedConsumeItems, toggleConsumeItems, "consumeItems")
-        imgui.text(language.get("descriptions.key"))
-        
-        local changed = false
-        for key,value in pairs(foodList) do
-            local foodKey = key
-            local effectName = value[1]
-            changed, settings.data.userChoices[foodKey] = imgui.slider_int(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, tostring(language.get("triggerLabels")))
-            settings.handleChange(changed, settings.data.userChoices, "userChoices")
-        end
-
-        if imgui.tree_node(language.get("debug")) then
-            if imgui.button("Toggle spawnVar") then
-                spawnVar = not spawnVar
-            end
-            imgui.text("userChoices obj: " .. json.dump_string(settings.data.userChoices))
-            imgui.text("spawnVar: " .. tostring(spawnVar))
-            imgui.text("death: " .. tostring(death))
-            imgui.text("dataDump:")
-            imgui.text(json.dump_string(dbg))
-            imgui.text(json.dump_string(dmp))
-            -- modUtils.printDebugInfo()
-            imgui.tree_pop()
-        end
-
-        if not settings.isSavingAvailable then
-            imgui.text(
-                language.get("descriptions.jsonWarning"))
-        end
-
-        imgui.spacing()
-        imgui.text(version)
-        imgui.spacing()
-        imgui.end_window()
-    elseif wasOpen then
-        wasOpen = false
-        settings.handleChange(true, settings.data.isWindowOpen, "isWindowOpen")
-    end
-end)
 
 local function getQuestManager()
     Quest_Obj = modUtils.getSingletonData("snow.QuestManager")
@@ -239,14 +153,39 @@ local function increaseStamina(player)
     return didApply
 end
 
+local function hasItemInPouch(itemId)
+    -- get inventory --
+	local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
+	local inventory = DataManager:get_field("_ItemPouch"):get_field("<VirtualSortInventoryList>k__BackingField"):get_elements();
+	local inventoryList = inventory[1]:get_field("mItems"):get_elements();
+    --log.debug('inventory length' .. #inventoryList)
+    for index = 1, #inventoryList do
+        local loopItem = inventoryList[index];
+        local pouchitemId = loopItem:call("getItemId");
+        local quantity = loopItem:call("getNum")
+        
+        --log.debug('inventory item: id = ' .. pouchitemId .. '; quantity = ' .. quantity)
+        if pouchitemId == itemId and quantity > 0 then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function consumeItem(consumeId)
+    sdk.find_type_definition("snow.data.DataShortcut"):get_method("consumeItemFromPouch"):call(nil, consumeId, 1)
+end
+
 local function applyBuff(foodKey, buffObject, overwrite)
     -- title, type, effectId, buffName, buffAmount, buffTimerName, buffTimerDuration
     local didApply = false
-    local itemId = itemList[foodKey]
-    local buffTitle = buffObject[1]
-    local buffTypes = buffObject[2]
-    local buffEffectId = buffObject[3]
-    local buffArray = buffObject[4]
+    local itemId = buffObject[1]
+    local buffTitle = buffObject[2]
+    local buffTypes = buffObject[3]
+    local buffEffectId = buffObject[4]
+    local buffArray = buffObject[5]
+    --log.debug('trying to apply buff: ' .. buffTitle)
     
     -- these are useless for now, but I might implement an optional inventory usage feature later, so I'll leave it in.
 	local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
@@ -268,6 +207,34 @@ local function applyBuff(foodKey, buffObject, overwrite)
 
     -- handle Free Meal --
     local freeMealLevel = playerDataManager:call("getHasPlayerSkillLvInQuestAndTrainingArea", PlayerIndex, 90)
+    local isFree = false
+    if (freeMealLevel > 0 and settings.data.consumeItems) then
+        math.randomseed(os.clock()*100000000000)
+        local rng = math.random(100)
+        local freeMealPercents = {10, 25, 45}
+        local activePercent = freeMealPercents[freeMealLevel]
+        if (activePercent > rng) then
+            isFree = true
+        end
+    end
+
+    -- consume the item if setting is turned on --
+    if (settings.data.consumeItems) then -- if the setting to consume items is on
+        if (itemId ~= 0) then -- skip this for non-consumable items like whetstone
+            --log.debug('trying to consume: ' .. buffTitle .. '.' .. itemId)
+            dbg.consumeOn = true
+            if (not hasItemInPouch(itemId)) then -- and if there is not an item of that ID in the pouch --
+                --log.debug('could not find ' .. buffTitle .. ' in player\'s pouch')
+                return false -- return that we didn't apply it, and that skip the application of effects --
+            else -- item is in the player's inventroy --
+                --log.debug('consumingItem: ' .. buffTitle .. '.' .. itemId)
+                if (not isFree) then -- if the player does not have free meal, or it wasn't activated --
+                    --log.debug('was not free')
+                    consumeItem(itemId) -- consume the item from the palyer's inventory
+                end
+            end
+        end
+    end
 
     -- handle stamina changers --
     if dracahnUtil.arrayContains(buffTypes, 3) then -- Stamina Up Item --
@@ -289,7 +256,6 @@ local function applyBuff(foodKey, buffObject, overwrite)
             player:set_field("<SharpnessGauge>k__BackingField", maxSharpness)
             didApply = true
         end
-        return didApply
     end
 
     if (dracahnUtil.arrayContains(buffTypes, 2)) then -- Healing Item --
@@ -317,26 +283,22 @@ local function applyBuff(foodKey, buffObject, overwrite)
     end
 
     if (didApply and buffEffectId > 0) then player:call("setEffect", 100, buffEffectId) end
-    return didApply
+    return didApply, isFree
 end
 
 local function AutoConsume()
     -- get data
     local questStatus = getQuestStatus()
     local inQuest = questStatus == 2 -- 2 means the player is in a quest
-    local inBattle = modUtils.checkIfInBattle()
-    local InMultiplayer = modUtils.checkIfInMultiplayer()
-    local isWeaponSheathed = dracahnUtil.isWeaponSheathed()
-    --dbg.questStatus = questStatus
-    --dbg.inQuest = inQuest
-    --dbg.inBattle = inBattle
-    --dbg.InMultiplayer = InMultiplayer
+    
     -- if I'm in a quest
     if (inQuest and not endQuest) then
-        -- there are 3 triggers to activate buffs:
-        -- 1. quest has started/player has respawned
-        -- 2. player has started combat
-        -- 3. always
+        local inBattle = modUtils.checkIfInBattle()
+        local InMultiplayer = modUtils.checkIfInMultiplayer()
+        if (settings.data.offlineOnly and InMultiplayer) then
+            return
+        end
+        local isWeaponSheathed = dracahnUtil.isWeaponSheathed()
 
         -- determine what level of items to activate and whether to activate
         -- set defaults
@@ -345,8 +307,8 @@ local function AutoConsume()
         if (isWeaponSheathed) then
             drawHolder = true
         elseif drawHolder then
-            if (death) then 
-                death = false 
+            if (death) then
+                death = false
                 spawnVar = true
             end -- turn the death flag off if you draw your weapon
             drawHolder = false
@@ -386,9 +348,11 @@ local function AutoConsume()
         dbg.actiavetEffects = activateEffects
         local appliedBuffs = {}
         for key,value in pairs(activateEffects) do
-            local applied = applyBuff(key, value, activateLevel ~= 5)
+            local applied, wasFree = applyBuff(key, value, activateLevel ~= 5)
             if (applied) then
-                appliedBuffs[#appliedBuffs+1] = value[1]
+                local messageText = value[2]
+                if wasFree then messageText = messageText .. "(free meal)" end
+                appliedBuffs[#appliedBuffs+1] = messageText
             end
         end
 
@@ -449,87 +413,65 @@ function(retval)
 end
 );
 
---[[
-    snow.player.PlayerUserDataItemParameter
+local function uiDetails()
+    local changedMessage, toggleMessage = imgui.checkbox(language.get("config.message"), settings.data.message)
+    settings.handleChange(changedMessage, toggleMessage, "message")
+    local changedConsumeItems, toggleConsumeItems = imgui.checkbox(language.get("config.consumeItems"), settings.data.consumeItems)
+    settings.handleChange(changedConsumeItems, toggleConsumeItems, "consumeItems")
+    imgui.text(language.get("descriptions.key"))
+    
+    local changed = false
 
-    {"Whetstone", 1}, _SharpnessHeal
-    {"DemonDrug", 2}, _DemondrugAtkUp
-    {"MegaDemonDrug", 3}, _GreatDemondrugAtkUp
-    {"DemonPowder", 4}, _DemondrugPowderAtkUp _DemonDrugPowderTimer
-    {"MightSeed", 5}, _MightSeedAtkUp _MightSeedTimer
-    {"Armorskin", 7}, _ArmorSkinDefUp
-    {"MegaArmorskin", 8}, _GreatArmorSkinDefUp
-    {"HardshellPowder", 9}, _ArmorSkinPowderDefUp _ArmorSkinPowderTimer
-    {"AdamantSeed", 10}, _AdamantSeedDefUp _AdamantSeedTimer
-    {"DashJuice", 12}, _StaminaUpBuffSecond
-    {"Immunizer", 13}, _VitalizerTimer
-    {"GourmetFish", 14}, _WellDoneFishEnableTimer
-    {"Ration", 15}
-]]
+    local triggerLabels = language.get("triggerLabels")
+    imgui.text(tostring(triggerLabels[1]))
 
+    for key,value in pairs(foodList) do
+        local foodKey = key
+        local effectName = value[2]
+        changed, settings.data.userChoices[foodKey] = imgui.slider_int(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, triggerLabels[settings.data.userChoices[foodKey]])
+        settings.handleChange(changed, settings.data.userChoices, "userChoices")
+    end
 
--- for use with @Bolt's 'Custom In-Game Mod Menu API'
-
-
-function IsModuleAvailable(name)
-    if package.loaded[name] then
-        return true
-    else
-        for _, searcher in ipairs(package.searchers or package.loaders) do
-            local loader = searcher(name)
-            if type(loader) == 'function' then
-                package.preload[name] = loader
-                return true
-            end
+    if imgui.tree_node(language.get("debug")) then
+        if imgui.button("Toggle spawnVar") then
+            spawnVar = not spawnVar
         end
-        return false
+        imgui.text("userChoices obj: " .. json.dump_string(settings.data.userChoices))
+        imgui.text("spawnVar: " .. tostring(spawnVar))
+        imgui.text("death: " .. tostring(death))
+        imgui.text("dataDump:")
+        imgui.text(json.dump_string(dbg))
+        imgui.text(json.dump_string(dmp))
+        -- modUtils.printDebugInfo()
+        imgui.tree_pop()
+    end
+
+    if not settings.isSavingAvailable then
+        imgui.text(
+            language.get("descriptions.jsonWarning"))
     end
 end
-  
-  
-  local apiPackageName = "ModOptionsMenu.ModMenuApi";
-  local modUI = nil;
-  local DrawSlider;
-  
-  if IsModuleAvailable(apiPackageName) then
-      modUI = require(apiPackageName);
-  end
-  
-  
-  if modUI and doOnce then
-      doOnce = false
-  
-      local name = language.get("Title")
-      local description = language.get("descriptions.short")
-      modUI.OnMenu(name, description, function()
-      
-          if modUI.version < 1.3 then
-          
-            modUI.Label(language.get("modUi.modUiOutOfDate"));
-          
-          else		
-            modUI.Header(language.get("modUi.generalSettings"))
-            local changedEnabled, toggleEnabled = modUI.CheckBox(language.get("config.enabled"), settings.data.enabled)
-            settings.handleChange(changedEnabled, toggleEnabled, "enabled")
-            local changedEnabled, toggleMessage = modUI.CheckBox(language.get("config.message"), settings.data.message)
-            settings.handleChange(changedEnabled, toggleMessage, "message")
-            modUI.Header(language.get("modUi.key"))
-            modUI.Label(language.get("modUi.off"));
-            modUI.Label(language.get("modUi.spawn"));
-            modUI.Label(language.get("modUi.combat"));
-            modUI.Label(language.get("modUi.draw"));
-            modUI.Label(language.get("modUi.always"));
-            modUI.Header(language.get("modUi.items"));
-            for key,value in pairs(foodList) do
-                local foodKey = key
-                local effectName = value[1]
-                local changed;
-                changed, settings.data.userChoices[foodKey] = modUI.Slider(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, language.get("modUi.")"1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
-                settings.handleChange(changed, settings.data.userChoices, "userChoices")
-            end
-            
-          end
-          modUI.Header(language.get("modUi.credits"))
-          modUI.Label(language.get("modUi.modBy") .. language.get("modUi.author"))
-      end)
-  end
+
+local function modUiDetails(modUi)
+    modUi.Header(language.get("modUi.key"))
+    modUi.Label(language.get("modUi.off"));
+    modUi.Label(language.get("modUi.spawn"));
+    modUi.Label(language.get("modUi.combat"));
+    modUi.Label(language.get("modUi.draw"));
+    modUi.Label(language.get("modUi.always"));
+    modUi.Header(language.get("modUi.items"));
+    for key,value in pairs(foodList) do
+        local foodKey = key
+        local effectName = value[2]
+        local changed;
+        changed, settings.data.userChoices[foodKey] = modUi.Slider(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, language.get("modUi.")"1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
+        settings.handleChange(changed, settings.data.userChoices, "userChoices")
+    end
+
+end
+
+re.on_draw_ui(function()
+    dracahnUtil.on_draw_ui(settings, language, langList, modName, version, uiDetails)
+end)
+
+dracahnUtil.modUi(settings, language, modUiDetails)

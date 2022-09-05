@@ -97,13 +97,12 @@ re.on_draw_ui(function()
         settings.data.isWindowOpen = imgui.begin_window(modName, settings.data.isWindowOpen, 0)
         settings.imgui("enabled", imgui.checkbox, language.get("config.enable"))
         imgui.spacing()
-        -- local changedSpecialWirebug, specialWirebug = imgui.slider_int(language.get("config.specialWirebug"), settings.data.)
         
         
         local changed = false
         for i = 1, 5, 1 do
             local loopChange
-            loopChange, settings.data.ecItemPouch[i] = imgui.combo(tostring(i), settings.data.ecItemPouch[i],endemicNamesForDropDown)
+            loopChange, settings.data.ecItemPouch[i] = imgui.combo(tostring(i), settings.data.ecItemPouch[i], endemicNamesForDropDown)
             changed = loopChange or changed
         end
         settings.handleChange(changed, settings.data.ecItemPouch, "ecItemPouch")

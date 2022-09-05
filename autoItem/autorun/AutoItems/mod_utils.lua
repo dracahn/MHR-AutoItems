@@ -40,7 +40,7 @@ function modUtils.getEnumMap(enumTypeName)
     return map
 end
 
-function modUtils.info(text) log.info("[MODUTILS] " .. text) end
+function modUtils.info(text) log.info("[MODUTILS.autoItems] " .. text) end
 
 function modUtils.getQuestStatus(questManager)
     if not questManager then
@@ -86,7 +86,7 @@ function modUtils.getPlayerCount()
 end
 
 -- Only works in quests
-function modUtils.checkIfInMultiplayer() return getPlayerCount() > 1 end
+function modUtils.checkIfInMultiplayer() return modUtils.getPlayerCount() > 1 end
 
 -- Enum maps should be obtained at the top level because they won't ever change while the game runs
 local mixEnumMap = modUtils.getEnumMap("snow.wwise.WwiseMixManager.Mix")
@@ -188,7 +188,7 @@ function modUtils.getConfigHandler(defaultSettings, modName)
     settings.isSavingAvailable = jsonUtils ~= nil
 
     function settings.saveConfig(newConfig)
-        saveConfig(settings.data, newConfig, modName)
+        modUtils.saveConfig(settings.data, newConfig, modName)
     end
 
     function settings.handleChange(changed, value, property)

@@ -8,14 +8,15 @@
     },
     "descriptions": {
         "short": "Automatically applies Items on different triggers",
-        "disclaimer": "For the time being, this mode does not requrie the items in your inventory to get the buffs.\r\nFunctionality for that (as well as using the items from your inventory) might come later.",
-        "key": "For each item in the 'Off' state: do nothing\r\nFor each item in the 'OnSpawn' state: Apply the buff a single time at the start of the hunt (or on death/respawn)\r\nFor each item in the 'StartOfCombat' state: Apply the buff at the start of combat'.\r\nFor each item in the 'Always' state: apply the buffs constantly (cheating)",
+        "key": "Each Trigger will apply all buffs to the right of it.\r\nFor each item in the 'Off' state: do nothing\r\nOnSpawn: Will trigger when the hunt starts, or the player carts/respawns\r\nStartOfCombat: Will trigger whenever the player enters a combat state (or after sleep/wakup, or wyvern riding)\r\nWeaponDraw: Whenever the hunter draws their weapons\r\nAlways: Whenever the buff expires, it will re-apply",
         "debug": "Debug Info (send a screenshot of this info along with the bug report)",
         "jsonWarning": "WARNING: JSON utils not available (your REFramework version may be outdated). Configuration will not be saved between restarts."
     },
     "config": {
         "enabled": "Enable",
-        "message": "Message"
+        "message": "Message",
+        "offlineOnly": "Offline Only",
+        "consumeItems": "Consume items from pouch"
     },
     "message": {
         "title": "Auto Consumed:"
