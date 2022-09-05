@@ -1,0 +1,59 @@
+{
+    "Title": "autoItem",
+    "author": "dracahn",
+    "Translator": "dracahn",
+    "window": {
+        "toggle": "Toggle AutoItem GUI",
+        "language": "Language: "
+    },
+    "descriptions": {
+        "short": "Automatically applies Items on different triggers",
+        "disclaimer": "For the time being, this mode does not requrie the items in your inventory to get the buffs.\r\nFunctionality for that (as well as using the items from your inventory) might come later.",
+        "key": "For each item in the 'Off' state: do nothing\r\nFor each item in the 'OnSpawn' state: Apply the buff a single time at the start of the hunt (or on death/respawn)\r\nFor each item in the 'StartOfCombat' state: Apply the buff at the start of combat'.\r\nFor each item in the 'Always' state: apply the buffs constantly (cheating)",
+        "debug": "Debug Info (send a screenshot of this info along with the bug report)",
+        "jsonWarning": "WARNING: JSON utils not available (your REFramework version may be outdated). Configuration will not be saved between restarts."
+    },
+    "config": {
+        "enabled": "Enable",
+        "message": "Message"
+    },
+    "message": {
+        "title": "Auto Consumed:"
+    },
+    "triggerLabels": [
+        "off", 
+        "OnSpawn", 
+        "StartOfCombat", 
+        "Weapon Draw", 
+        "Always"
+    ],
+    "foods": {
+        "Demondrug":"Demondrug",
+        "MegaDemondrug":"Mega Demondrug",
+        "Armorskin":"Armorskin",
+        "MegaArmorskin":"Mega Armorskin",
+        "MightSeed":"Might Seed",
+        "DemonPowder":"Demon Powder",
+        "AdamantSeed":"Adamant Seed",
+        "HardshellPowder":"Hardshell Powder",
+        "GourmetFish":"Gourmet Fish",
+        "Immunizer":"Immunizer",
+        "DashJuice":"Dash Juice",
+        "Whetstone":"Whetstone",
+        "MaxPotion":"Max Potion",
+        "Ration":"Ration"
+    },
+    "modUi": {
+        "modUiOutOfDate": "Please update mod menu API.",
+        "generalSettings": "General Settings",
+        "key": "Key",
+        "off": "1 = off",
+        "spawn": "2 = On Quest Start/respawn",
+        "combat": "3 = On Combat Start",
+        "draw": "4 = On Weapon Draw",
+        "always": "5 = Always",
+        "items": "Items",
+        "credits": "Credits",
+        "modBy": "Mod By: "
+    }
+}
