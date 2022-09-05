@@ -1,0 +1,55 @@
+{
+    "Title": "autoEndemic",
+    "Translator": "dracahn",
+    "window": {
+        "toggle": "open autoEndemic config",
+        "description": "Select what Hunting Helpers you want added to your Helper Cage at the start of the next quest:"
+    },
+    "config": {
+        "enable": "enable"
+    },
+    "endemicLifeIds": [
+        67108864,
+        69206016,
+        69206017,
+        69206018,
+        69206019,
+        69206020,
+        69206021,
+        69206022,
+        69206023,
+        69206024,
+        69206025,
+        69206026,
+        69206027,
+        69206028,
+        69206029,
+        69206030,
+        69206031,
+        69206032,
+        69206036,
+        69206037
+    ],
+    "endemicLife": {
+        "67108864": "Empty",
+        "69206016": "Mudbeetle",
+        "69206017": "Paratoad",
+        "69206018": "Puppet Spider",
+        "69206019": "Escuregot",
+        "69206020": "Aurortle",
+        "69206021": "Stinkmink",
+        "69206022": "Wailnard",
+        "69206023": "Firebeetle",
+        "69206024": "Thunderbeetle",
+        "69206025": "Snowbeetle",
+        "69206026": "Trapbugs",
+        "69206027": "Lanternbug",
+        "69206028": "Brewhare",
+        "69206029": "Antidobra",
+        "69206030": "Sleeptoad",
+        "69206031": "Poisontoad",
+        "69206032": "Blastoad",
+        "69206036": "Gustcrab",
+        "69206037": "Marionette Spider"
+    }
+}

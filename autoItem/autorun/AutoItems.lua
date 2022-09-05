@@ -1,5 +1,3 @@
-Ordered_Table = require"AutoItems/ordered_table"
-
 local modName = "AutoItems"
 local version = "1.0.0"
 local author = "dracahn"
@@ -20,6 +18,11 @@ local dmp = {}
 
 local modUtils = require(modName .. "/mod_utils")
 local dracahnUtil = require(modName .. "/dracahn_util")
+local language = require(modName .. "/Language")
+local langList = {
+    "en-us",
+    "en-nn",
+},
 
 log.info(modName .. " loaded!")  -- Writes to game folder/re2_framework_log.txt
 modUtils.info("Does the same as above, but puts [MODUTILS] at the beginning of the line, allowing you to find your logs among other logs easier")
@@ -28,26 +31,15 @@ local settings = modUtils.getConfigHandler({
     enabled = true,
     message = true,
     isWindowOpen = true,
-    userChoices = {}
+    userChoices = {},
+    language = {
+        current = "en-us",
+        languages = {},
+        sorted = {},
+    }
 }, modName)
-
-local foodList = {
-    --Whetstone = 68157450,
-    DemonDrug = 68157917,
-    MegaDemonDrug = 68157918,
-    DemonPowder =  68157920,
-    MightSeed = 68157919,
-    Armorskin = 68157922,
-    MegaArmorskin = 68157923,
-    HardshellPowder = 68157925,
-    AdamantSeed = 68157924,
-    DashJuice = 68157913,
-    Immunizer = 68157911,
-    GourmetFish = 68157909,
-    --Ration = 68157912,
-    --AncientPotion = 68157907
-    --felvine = ?? -- todo: Someday
-}
+-- Load the languages
+language.init(settings)
 
 local itemList = {
 	[1] = 68157917,
@@ -77,22 +69,21 @@ local itemList = {
 local foodList = {
     -- [itemId] = {title, types, effectId, {{buffFieldName, buffFieldValue}, .. }}
 	[1] = {"Demondrug", {0}, 110, {{"_AtkUpAlive", "_DemondrugAtkUp", nil}}},
-	[2] = {"Mega Demondrug", {0}, 110, {{"_AtkUpAlive", "_GreatDemondrugAtkUp", nil}}},
+	[2] = {"MegaDemondrug", {0}, 110, {{"_AtkUpAlive", "_GreatDemondrugAtkUp", nil}}},
 	[3] = {"Armorskin", {0}, 110, {{"_DefUpAlive", "_ArmorSkinDefUp", nil}}},
-	[4] = {"Mega Armorskin", {0}, 110, {{"_DefUpAlive" , "_GreatArmorSkinDefUp", nil}}},
-	[5] = {"Might Seed", {0}, 110, {{"_AtkUpBuffSecond", "_MightSeedAtkUp", nil}, {"_AtkUpBuffSecondTimer", "_MightSeedTimer", 60}}},
-	[6] = {"Demon Powder", {0}, 110, {{"_AtkUpItemSecond", "_DemondrugPowderAtkUp", nil}, {"_AtkUpItemSecondTimer", "_DemondrugPowderTimer", 60}}},
-	[7] = {"Adamant Seed", {0}, 110, {{"_DefUpBuffSecond", "_AdamantSeedDefUp", nil}, {"_DefUpBuffSecondTimer", "_AdamantSeedTimer", 60}}},
-	[8] = {"Hardshell Powder", {0}, 110, {{"_DefUpItemSecond", "_ArmorSkinPowderDefUp", nil}, {"_DefUpItemSecondTimer", "_ArmorSkinPowderTimer", 60}}},
-	[10] = {"Gourmet Fish", {0}, 100, {{"_FishRegeneEnableTimer", "_WellDoneFishEnableTimer", 60}}},
+	[4] = {"MegaArmorskin", {0}, 110, {{"_DefUpAlive" , "_GreatArmorSkinDefUp", nil}}},
+	[5] = {"MightSeed", {0}, 110, {{"_AtkUpBuffSecond", "_MightSeedAtkUp", nil}, {"_AtkUpBuffSecondTimer", "_MightSeedTimer", 60}}},
+	[6] = {"DemonPowder", {0}, 110, {{"_AtkUpItemSecond", "_DemondrugPowderAtkUp", nil}, {"_AtkUpItemSecondTimer", "_DemondrugPowderTimer", 60}}},
+	[7] = {"AdamantSeed", {0}, 110, {{"_DefUpBuffSecond", "_AdamantSeedDefUp", nil}, {"_DefUpBuffSecondTimer", "_AdamantSeedTimer", 60}}},
+	[8] = {"HardshellPowder", {0}, 110, {{"_DefUpItemSecond", "_ArmorSkinPowderDefUp", nil}, {"_DefUpItemSecondTimer", "_ArmorSkinPowderTimer", 60}}},
+	[10] = {"GourmetFish", {0}, 100, {{"_FishRegeneEnableTimer", "_WellDoneFishEnableTimer", 60}}},
 	[11] = {"Immunizer", {0}, 102, {{"_VitalizerTimer", "_VitalizerTimer", 60}}},
-	[9] = {"Dash Juice", {0, 3}, 102, {{"_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 60}}},
+	[9] = {"DashJuice", {0, 3}, 102, {{"_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 60}}},
 
     [12] = {"Whetstone", {1}, -1},
-    [13] = {"Max Potion", {2}, 100},
+    [13] = {"MaxPotion", {2}, 100},
     [14] = {"Ration", {3}, -1},
 }
-local labels = {"off", "OnSpawn", "StartOfCombat", "Weapon Draw", "Always"}
 local polishTime = {30, 60, 90}
 local itemProlongerMultipliers = {1, 1.1, 1.25, 1.5}
 
@@ -105,7 +96,7 @@ for key,value in pairs(foodList) do
 end
 
 re.on_draw_ui(function()
-    if imgui.button("Toggle AutoItem GUI") then
+    if imgui.button(language.get("window.toggle")) then
         settings.data.isWindowOpen = not settings.data.isWindowOpen
         settings.handleChange(true, settings.data.isWindowOpen, "isWindowOpen")
     end
@@ -117,27 +108,34 @@ re.on_draw_ui(function()
         settings.data.isWindowOpen = imgui.begin_window(modName, settings.data.isWindowOpen, 0)
 
         imgui.spacing()
-        imgui.text("For the time being, this mode does not requrie the items in your inventory to get the buffs.\r\nFunctionality for that (as well as using the items from your inventory) might come later.")
+        local langChange, newVal = imgui.combo(language.get("enabled"), settings.data.language.current, langList)
+        settings.data.language.current = langList[newVal]
+        settings.handleChange(langChange, settings.data.language, "language")
         imgui.spacing()
-        local changedEnabled, toggleEnabled = imgui.checkbox("Enable", settings.data.enabled)
+        imgui.text(language.get("disclaimer"))
+        imgui.spacing()
+        local changedEnabled, toggleEnabled = imgui.checkbox(language.get("enabled"), settings.data.enabled)
         settings.handleChange(changedEnabled, toggleEnabled, "enabled")
-        local changedEnabled, toggleMessage = imgui.checkbox("Message", settings.data.message)
-        settings.handleChange(changedEnabled, toggleMessage, "message")
+        local changedOfflineOnly, toggleOfflineOnly = imgui.checkbox(language.get("offlineOnly"), settings.data.offlineOnly)
+        settings.handleChange(changedOfflineOnly, toggleOfflineOnly, "offlineOnly")
+        local changedMessage, toggleMessage = imgui.checkbox(language.get("message"), settings.data.message)
+        settings.handleChange(changedMessage, toggleMessage, "message")
         imgui.spacing()
-        imgui.text("For each item in the 'Off' state: do nothing\r\n" ..
-            "For each item in the 'OnSpawn' state: Apply the buff a single time at the start of the hunt (or on death/respawn)\r\n" ..
-            "For each item in the 'StartOfCombat' state: Apply the buff at the start of combat'.\r\n" ..
-            "For each item in the 'Always' state: apply the buffs constantly (cheating)")
+        local changedRequireItems, toggleRequireItems = imgui.checkbox(language.get("requireItems"), settings.data.requireItems)
+        settings.handleChange(changedRequireItems, toggleRequireItems, "requireItems")
+        local changedConsumeItems, toggleConsumeItems = imgui.checkbox(language.get("consumeItems"), settings.data.consumeItems)
+        settings.handleChange(changedConsumeItems, toggleConsumeItems, "consumeItems")
+        imgui.text(language.get("descriptions.key"))
         
         local changed = false
         for key,value in pairs(foodList) do
             local foodKey = key
             local effectName = value[1]
-            changed, settings.data.userChoices[foodKey] = imgui.slider_int(effectName, settings.data.userChoices[foodKey], 1, 5, tostring(labels[settings.data.userChoices[foodKey]]))
+            changed, settings.data.userChoices[foodKey] = imgui.slider_int(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, tostring(language.get("triggerLabels")))
             settings.handleChange(changed, settings.data.userChoices, "userChoices")
         end
 
-        if imgui.tree_node("Debug Info (send a screenshot of this info along with the bug report)") then
+        if imgui.tree_node(language.get("debug")) then
             if imgui.button("Toggle spawnVar") then
                 spawnVar = not spawnVar
             end
@@ -153,7 +151,7 @@ re.on_draw_ui(function()
 
         if not settings.isSavingAvailable then
             imgui.text(
-                "WARNING: JSON utils not available (your REFramework version may be outdated). Configuration will not be saved between restarts.")
+                language.get("descriptions.jsonWarning"))
         end
 
         imgui.spacing()
@@ -218,6 +216,29 @@ local function getStaminaBuffCage()
 	return (stamina + 150) * 30;
 end
 
+local function increaseStamina(player)
+    local didApply = false
+    local stamina = player:get_field("_stamina");
+    local staminaMax = player:get_field("_staminaMax");
+    local initMax = staminaMax
+    
+    if getStaminaBuffCage() < (stamina + 1500) then
+        stamina = getStaminaBuffCage();
+    else
+        stamina = (stamina + 1500);
+    end
+    
+    if getStaminaBuffCage() < (staminaMax + 1500) then
+        staminaMax = getStaminaBuffCage();
+    else
+        staminaMax = (staminaMax + 1500);
+    end
+    player:set_field("_stamina", stamina);
+    player:set_field("_staminaMax", staminaMax);
+    if staminaMax > initMax then didApply = true end
+    return didApply
+end
+
 local function applyBuff(foodKey, buffObject, overwrite)
     -- title, type, effectId, buffName, buffAmount, buffTimerName, buffTimerDuration
     local didApply = false
@@ -250,24 +271,7 @@ local function applyBuff(foodKey, buffObject, overwrite)
 
     -- handle stamina changers --
     if dracahnUtil.arrayContains(buffTypes, 3) then -- Stamina Up Item --
-        local stamina = playerList[PlayerIndex + 1]:get_field("_stamina");
-        local staminaMax = playerList[PlayerIndex + 1]:get_field("_staminaMax");
-        local initMax = staminaMax
-        
-        if getStaminaBuffCage() < (stamina + 1500) then
-            stamina = getStaminaBuffCage();
-        else
-            stamina = (stamina + 1500);
-        end
-        
-        if getStaminaBuffCage() < (staminaMax + 1500) then
-            staminaMax = getStaminaBuffCage();
-        else
-            staminaMax = (staminaMax + 1500);
-        end
-        playerList[PlayerIndex + 1]:set_field("_stamina", stamina);
-        playerList[PlayerIndex + 1]:set_field("_staminaMax", staminaMax);
-        if staminaMax > initMax then didApply = true end
+        didApply = increaseStamina(playerList[PlayerIndex + 1])
     end
 
     if (dracahnUtil.arrayContains(buffTypes, 1)) then -- Sharepen Item --
@@ -389,7 +393,7 @@ local function AutoConsume()
         end
 
         if (settings.data.message and #appliedBuffs > 0) then
-            local message = "<COL RED>Auto Consumed:</COL>";
+            local message = "<COL RED>".. language.get("message.title") .. "</COL>";
             for key,value in pairs(appliedBuffs) do
                 message = message .. "\n" .. value
             end
@@ -495,37 +499,37 @@ end
   if modUI and doOnce then
       doOnce = false
   
-      local name = "Auto Items"
-      local description = "Automatically applies Items on different triggers"
+      local name = language.get("Title")
+      local description = language.get("descriptions.short")
       modUI.OnMenu(name, description, function()
       
           if modUI.version < 1.3 then
           
-            modUI.Label("Please update mod menu API.");
+            modUI.Label(language.get("modUi.modUiOutOfDate"));
           
           else		
-            modUI.Header("General Settings")
-            local changedEnabled, toggleEnabled = modUI.CheckBox("Enable", settings.data.enabled)
+            modUI.Header(language.get("modUi.generalSettings"))
+            local changedEnabled, toggleEnabled = modUI.CheckBox(language.get("config.enabled"), settings.data.enabled)
             settings.handleChange(changedEnabled, toggleEnabled, "enabled")
-            local changedEnabled, toggleMessage = modUI.CheckBox("Message", settings.data.message)
+            local changedEnabled, toggleMessage = modUI.CheckBox(language.get("config.message"), settings.data.message)
             settings.handleChange(changedEnabled, toggleMessage, "message")
-            modUI.Header("Key")
-            modUI.Label("1 = off");
-            modUI.Label("2 = On Quest Start/respawn");
-            modUI.Label("3 = On Combat Start");
-            modUI.Label("4 = On Weapon Draw");
-            modUI.Label("5 = Always");
-            modUI.Header("Items");
+            modUI.Header(language.get("modUi.key"))
+            modUI.Label(language.get("modUi.off"));
+            modUI.Label(language.get("modUi.spawn"));
+            modUI.Label(language.get("modUi.combat"));
+            modUI.Label(language.get("modUi.draw"));
+            modUI.Label(language.get("modUi.always"));
+            modUI.Header(language.get("modUi.items"));
             for key,value in pairs(foodList) do
                 local foodKey = key
                 local effectName = value[1]
                 local changed;
-                changed, settings.data.userChoices[foodKey] = modUI.Slider(effectName, settings.data.userChoices[foodKey], 1, 5, "1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
+                changed, settings.data.userChoices[foodKey] = modUI.Slider(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, language.get("modUi.")"1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
                 settings.handleChange(changed, settings.data.userChoices, "userChoices")
             end
             
           end
-          modUI.Header("Credits")
-          modUI.Label("Mod By: Dracahn")
+          modUI.Header(language.get("modUi.credits"))
+          modUI.Label(language.get("modUi.modBy") .. language.get("modUi.author"))
       end)
   end

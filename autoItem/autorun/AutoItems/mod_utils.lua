@@ -1,18 +1,19 @@
 local jsonUtils = json
+local modUtils = {}
 
 -- Aliases
-local function getType(name) return sdk.find_type_definition(name) end
+function modUtils.getType(name) return sdk.find_type_definition(name) end
 
-local function getSingletonData(name)
-    return {sdk.get_managed_singleton(name), getType(name)}
+function modUtils.getSingletonData(name)
+    return {sdk.get_managed_singleton(name), modUtils.getType(name)}
 end
 
-local function getSingletonField(singleton, name)
+function modUtils.getSingletonField(singleton, name)
     local singletonRef, typedef = table.unpack(singleton)
     return singletonRef:get_field(name)
 end
 
-local function callSingletonFunc(singleton, name, ...)
+function modUtils.callSingletonFunc(singleton, name, ...)
     local args = {...}
     local singletonRef, typedef = table.unpack(singleton)
     return singletonRef:call(name, table.unpack(args))
@@ -21,8 +22,8 @@ end
 -- Returns a table with enum names by value, so you can do:
 -- imgui.text("Current quest type: " .. questTypeEnumMap[currentQuestType] .. " (" .. currentQuestType .. ")")
 -- Which shows "Current quest type: INVALID (0)"
-local function getEnumMap(enumTypeName)
-    local typeDef = getType(enumTypeName)
+function modUtils.getEnumMap(enumTypeName)
+    local typeDef = modUtils.getType(enumTypeName)
     if not typeDef then return {} end
 
     local fields = typeDef:get_fields()
@@ -39,30 +40,30 @@ local function getEnumMap(enumTypeName)
     return map
 end
 
-local function info(text) log.info("[MODUTILS] " .. text) end
+function modUtils.info(text) log.info("[MODUTILS] " .. text) end
 
-local function getQuestStatus(questManager)
+function modUtils.getQuestStatus(questManager)
     if not questManager then
-        questManager = getSingletonData("snow.QuestManager")
+        questManager = modUtils.getSingletonData("snow.QuestManager")
     end
-    return getSingletonField(questManager, "_QuestStatus")
+    return modUtils.getSingletonField(questManager, "_QuestStatus")
 end
 
 -- Very useful if you don't want your mod to interfere in fights
-local function checkIfInBattle()
-    local musicManager = getSingletonData("snow.wwise.WwiseMusicManager")
+function modUtils.checkIfInBattle()
+    local musicManager = modUtils.getSingletonData("snow.wwise.WwiseMusicManager")
 
-    local currentMusicType = getSingletonField(musicManager, "_FightBGMType")
-    local currentBattleState = getSingletonField(musicManager,
+    local currentMusicType = modUtils.getSingletonField(musicManager, "_FightBGMType")
+    local currentBattleState = modUtils.getSingletonField(musicManager,
                                                  "_CurrentEnemyAction")
 
-    local musicMixManager = getSingletonData("snow.wwise.WwiseMixManager")
-    local currentMixUsed = getSingletonField(musicMixManager, "_Current")
+    local musicMixManager = modUtils.getSingletonData("snow.wwise.WwiseMixManager")
+    local currentMixUsed = modUtils.getSingletonField(musicMixManager, "_Current")
 
-    local questManager = getSingletonData("snow.QuestManager")
+    local questManager = modUtils.getSingletonData("snow.QuestManager")
 
-    local currentQuestType = getSingletonField(questManager, "_QuestType")
-    local currentQuestStatus = getSingletonField(questManager, "_QuestStatus")
+    local currentQuestType = modUtils.getSingletonField(questManager, "_QuestType")
+    local currentQuestStatus = modUtils.getSingletonField(questManager, "_QuestStatus")
 
     local inBattle = currentBattleState == 3 -- Fighting a monster
     or currentMixUsed == 37 -- Fighting a wave of monsters
@@ -77,43 +78,43 @@ local function checkIfInBattle()
 end
 
 -- Doesn't show how many players are on your lobby, only in quests
-local function getPlayerCount()
-    local questManager = getSingletonData("snow.QuestManager")
-    local numberOfPlayers = getSingletonField(questManager, "_TotalJoinNum")
+function modUtils.getPlayerCount()
+    local questManager = modUtils.getSingletonData("snow.QuestManager")
+    local numberOfPlayers = modUtils.getSingletonField(questManager, "_TotalJoinNum")
 
     return numberOfPlayers
 end
 
 -- Only works in quests
-local function checkIfInMultiplayer() return getPlayerCount() > 1 end
+function modUtils.checkIfInMultiplayer() return getPlayerCount() > 1 end
 
 -- Enum maps should be obtained at the top level because they won't ever change while the game runs
-local mixEnumMap = getEnumMap("snow.wwise.WwiseMixManager.Mix")
-local fightBgmEnumMap = getEnumMap(
+local mixEnumMap = modUtils.getEnumMap("snow.wwise.WwiseMixManager.Mix")
+local fightBgmEnumMap = modUtils.getEnumMap(
                             "snow.wwise.WwiseEnemyMonitoredParameters.FightBGMType")
 local enemyActionEnumMap =
-    getEnumMap("snow.wwise.WwiseMusicManager.EnemyAction")
-local questTypeEnumMap = getEnumMap("snow.quest.QuestType")
-local questStatusEnumMap = getEnumMap("snow.QuestManager.Status")
+    modUtils.getEnumMap("snow.wwise.WwiseMusicManager.EnemyAction")
+local questTypeEnumMap = modUtils.getEnumMap("snow.quest.QuestType")
+local questStatusEnumMap = modUtils.getEnumMap("snow.QuestManager.Status")
 
 -- Only works when called inside on_draw_ui
-local function printDebugInfo()
-    local questTypeEnumMap = getEnumMap("snow.quest.QuestType")
+function modUtils.printDebugInfo()
+    local questTypeEnumMap = modUtils.getEnumMap("snow.quest.QuestType")
     local a, b = pcall(function()
-        local musicManager = getSingletonData("snow.wwise.WwiseMusicManager")
-        local questManager = getSingletonData("snow.QuestManager")
-        local musicMixManager = getSingletonData("snow.wwise.WwiseMixManager")
+        local musicManager = modUtils.getSingletonData("snow.wwise.WwiseMusicManager")
+        local questManager = modUtils.getSingletonData("snow.QuestManager")
+        local musicMixManager = modUtils.getSingletonData("snow.wwise.WwiseMixManager")
 
         local currentMusicType =
-            getSingletonField(musicManager, "_FightBGMType")
-        local currentBattleState = getSingletonField(musicManager,
+            modUtils.getSingletonField(musicManager, "_FightBGMType")
+        local currentBattleState = modUtils.getSingletonField(musicManager,
                                                      "_CurrentEnemyAction")
 
-        local currentMixUsed = getSingletonField(musicMixManager, "_Current")
-        local currentQuestType = getSingletonField(questManager, "_QuestType")
-        local currentQuestStatus = getSingletonField(questManager,
+        local currentMixUsed = modUtils.getSingletonField(musicMixManager, "_Current")
+        local currentQuestType = modUtils.getSingletonField(questManager, "_QuestType")
+        local currentQuestStatus = modUtils.getSingletonField(questManager,
                                                      "_QuestStatus")
-        local numberOfPlayers = getSingletonField(questManager, "_TotalJoinNum")
+        local numberOfPlayers = modUtils.getSingletonField(questManager, "_TotalJoinNum")
         local playersSuffix = "players"
         if numberOfPlayers == 1 then playersSuffix = "player" end
 
@@ -148,13 +149,13 @@ end
 -- Example for SnS: "snow.player.ShortSword" -> "snow.player.PlayerQuestBase" -> "snow.player.PlayerBase"
 -- Example while in the Lobby(outside of the training area), regardless of weapon: "snow.player.PlayerLobbyBase" -> "snow.player.PlayerBase"
 -- Needs to be obtained exactly when you're using it (like on a pre/post hook) since it changes frequently
-local function getCurrentPlayer()
+function modUtils.getCurrentPlayer()
     return sdk.get_managed_singleton("snow.player.PlayerManager"):call(
                "findMasterPlayer")
 end
 
 -- You'll probably not need this, as getConfigHandler already handles everything
-local function loadConfig(defaultConfig, modName)
+function modUtils.loadConfig(defaultConfig, modName)
     local currentConfig = {}
 
     if jsonUtils ~= nil then
@@ -170,7 +171,7 @@ end
 
 -- You can use this, but it's easier to use settings.saveConfig instead
 -- "settings" is a table returned by calling getConfigHandler.
-local function saveConfig(currentConfig, newConfig, modName)
+function modUtils.saveConfig(currentConfig, newConfig, modName)
     for k, v in pairs(newConfig) do currentConfig[k] = v end
 
     if jsonUtils ~= nil then
@@ -179,10 +180,10 @@ local function saveConfig(currentConfig, newConfig, modName)
 end
 
 -- Handles and persists your mod configuration for you, so users don't have to toggle stuff every restart.
-local function getConfigHandler(defaultSettings, modName)
+function modUtils.getConfigHandler(defaultSettings, modName)
     local settings = {}
 
-    settings.data = loadConfig(defaultSettings, modName)
+    settings.data = modUtils.loadConfig(defaultSettings, modName)
 
     settings.isSavingAvailable = jsonUtils ~= nil
 
@@ -215,21 +216,5 @@ local function getConfigHandler(defaultSettings, modName)
 
     return settings
 end
-
-local modUtils = {}
-
-modUtils.getType = getType;
-modUtils.getSingletonData = getSingletonData;
-modUtils.getSingletonField = getSingletonField;
-modUtils.getEnumMap = getEnumMap;
-modUtils.checkIfInBattle = checkIfInBattle;
-modUtils.getCurrentPlayer = getCurrentPlayer;
-modUtils.getPlayerCount = getPlayerCount;
-modUtils.checkIfInMultiplayer = checkIfInMultiplayer;
-modUtils.getConfigHandler = getConfigHandler;
-modUtils.callSingletonFunc = callSingletonFunc;
-modUtils.printDebugInfo = printDebugInfo;
-modUtils.info = info;
-modUtils.getQuestStatus = getQuestStatus;
 
 return modUtils
