@@ -31,7 +31,7 @@ function language.read_languages()
         local languageName = utils.split(fileName, ".")[1]
         languages[languageName] = json.load_file(file)
         languages.dbg = json.load_file(file)
-        --languages.files[file].split = 
+        --languages.files[file].split =
         --languages.files[file].fileName = fileName
         --languages.files[file].languageName = languageName
     end
@@ -42,7 +42,7 @@ end
 -- Get a single value from the language from the provided key
 function language.get(key)
     if language.configHandler.data.language.current == nil then
-        return "current langauge is nil for key: ".. key
+        return "current langauge is nil for key: " .. key
     end
     if language.configHandler.data.languages[language.configHandler.data.language.current] == nil then
         return "cannot find current language '" .. language.configHandler.data.language.current .. "': " .. key
@@ -57,7 +57,7 @@ function language.get(key)
         local value = language_data
         for i = 1, #keys do
             value = value[keys[i]]
-            if value == nil then return "Invalid Language Key: "..key end
+            if value == nil then return "Invalid Language Key: " .. key end
         end
         return value
     end

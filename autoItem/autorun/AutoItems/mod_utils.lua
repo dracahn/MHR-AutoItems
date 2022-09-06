@@ -5,7 +5,7 @@ local modUtils = {}
 function modUtils.getType(name) return sdk.find_type_definition(name) end
 
 function modUtils.getSingletonData(name)
-    return {sdk.get_managed_singleton(name), modUtils.getType(name)}
+    return { sdk.get_managed_singleton(name), modUtils.getType(name) }
 end
 
 function modUtils.getSingletonField(singleton, name)
@@ -14,7 +14,7 @@ function modUtils.getSingletonField(singleton, name)
 end
 
 function modUtils.callSingletonFunc(singleton, name, ...)
-    local args = {...}
+    local args = { ... }
     local singletonRef, typedef = table.unpack(singleton)
     return singletonRef:call(name, table.unpack(args))
 end
@@ -55,7 +55,7 @@ function modUtils.checkIfInBattle()
 
     local currentMusicType = modUtils.getSingletonField(musicManager, "_FightBGMType")
     local currentBattleState = modUtils.getSingletonField(musicManager,
-                                                 "_CurrentEnemyAction")
+        "_CurrentEnemyAction")
 
     local musicMixManager = modUtils.getSingletonData("snow.wwise.WwiseMixManager")
     local currentMixUsed = modUtils.getSingletonField(musicMixManager, "_Current")
@@ -66,13 +66,13 @@ function modUtils.checkIfInBattle()
     local currentQuestStatus = modUtils.getSingletonField(questManager, "_QuestStatus")
 
     local inBattle = currentBattleState == 3 -- Fighting a monster
-    or currentMixUsed == 37 -- Fighting a wave of monsters
-    or currentMixUsed == 10 -- Stronger battle music mix is being used
-    or currentMixUsed == 31 -- Used in some arena battles
-    or currentQuestType == 64 -- Fighting in the arena (Utsushi)
+        or currentMixUsed == 37 -- Fighting a wave of monsters
+        or currentMixUsed == 10 -- Stronger battle music mix is being used
+        or currentMixUsed == 31 -- Used in some arena battles
+        or currentQuestType == 64 -- Fighting in the arena (Utsushi)
 
     local isQuestComplete = currentQuestStatus == 3 -- Completed the quest
-    or currentQuestStatus == 0 -- Not in a quest
+        or currentQuestStatus == 0 -- Not in a quest
 
     return inBattle and not isQuestComplete
 end
@@ -91,9 +91,9 @@ function modUtils.checkIfInMultiplayer() return modUtils.getPlayerCount() > 1 en
 -- Enum maps should be obtained at the top level because they won't ever change while the game runs
 local mixEnumMap = modUtils.getEnumMap("snow.wwise.WwiseMixManager.Mix")
 local fightBgmEnumMap = modUtils.getEnumMap(
-                            "snow.wwise.WwiseEnemyMonitoredParameters.FightBGMType")
+    "snow.wwise.WwiseEnemyMonitoredParameters.FightBGMType")
 local enemyActionEnumMap =
-    modUtils.getEnumMap("snow.wwise.WwiseMusicManager.EnemyAction")
+modUtils.getEnumMap("snow.wwise.WwiseMusicManager.EnemyAction")
 local questTypeEnumMap = modUtils.getEnumMap("snow.quest.QuestType")
 local questStatusEnumMap = modUtils.getEnumMap("snow.QuestManager.Status")
 
@@ -106,39 +106,39 @@ function modUtils.printDebugInfo()
         local musicMixManager = modUtils.getSingletonData("snow.wwise.WwiseMixManager")
 
         local currentMusicType =
-            modUtils.getSingletonField(musicManager, "_FightBGMType")
+        modUtils.getSingletonField(musicManager, "_FightBGMType")
         local currentBattleState = modUtils.getSingletonField(musicManager,
-                                                     "_CurrentEnemyAction")
+            "_CurrentEnemyAction")
 
         local currentMixUsed = modUtils.getSingletonField(musicMixManager, "_Current")
         local currentQuestType = modUtils.getSingletonField(questManager, "_QuestType")
         local currentQuestStatus = modUtils.getSingletonField(questManager,
-                                                     "_QuestStatus")
+            "_QuestStatus")
         local numberOfPlayers = modUtils.getSingletonField(questManager, "_TotalJoinNum")
         local playersSuffix = "players"
         if numberOfPlayers == 1 then playersSuffix = "player" end
 
         imgui.text("Detected as \"in battle\"? " ..
-                       (checkIfInBattle() and "Yes" or "No"))
+            (checkIfInBattle() and "Yes" or "No"))
         imgui.text("Detected as \"in multiplayer\"? " ..
-                       (checkIfInMultiplayer() and "Yes" or "No") .. " (" ..
-                       numberOfPlayers .. " " .. playersSuffix .. " in quest)")
+            (checkIfInMultiplayer() and "Yes" or "No") .. " (" ..
+            numberOfPlayers .. " " .. playersSuffix .. " in quest)")
         imgui.text("");
         imgui.text(
             "Current quest type: " .. questTypeEnumMap[currentQuestType] .. " (" ..
-                currentQuestType .. ")")
+            currentQuestType .. ")")
         imgui.text("Current quest status: " ..
-                       questStatusEnumMap[currentQuestStatus] .. " (" ..
-                       currentQuestStatus .. ")")
+            questStatusEnumMap[currentQuestStatus] .. " (" ..
+            currentQuestStatus .. ")")
         imgui.text("Current fight music type: " ..
-                       fightBgmEnumMap[currentMusicType] .. " (" ..
-                       currentMusicType .. ")")
+            fightBgmEnumMap[currentMusicType] .. " (" ..
+            currentMusicType .. ")")
         imgui.text(
             "Current music mix: " .. mixEnumMap[currentMixUsed] .. " (" ..
-                currentMixUsed .. ")")
+            currentMixUsed .. ")")
         imgui.text("Current battle state: " ..
-                       enemyActionEnumMap[currentBattleState] .. " (" ..
-                       currentBattleState .. ")")
+            enemyActionEnumMap[currentBattleState] .. " (" ..
+            currentBattleState .. ")")
     end)
     log.info(b)
 end
@@ -151,7 +151,7 @@ end
 -- Needs to be obtained exactly when you're using it (like on a pre/post hook) since it changes frequently
 function modUtils.getCurrentPlayer()
     return sdk.get_managed_singleton("snow.player.PlayerManager"):call(
-               "findMasterPlayer")
+        "findMasterPlayer")
 end
 
 -- You'll probably not need this, as getConfigHandler already handles everything
@@ -200,7 +200,7 @@ function modUtils.getConfigHandler(defaultSettings, modName)
     end
 
     function settings.imgui(property, imguiFunc, ...)
-        local args = {...}
+        local args = { ... }
         local changed, newValue = imguiFunc(args[1], settings.data[property], table.unpack(args, 2))
         if changed == nil or newValue == nil then
             error("settings.imgui was called with an invalid imgui func")
@@ -211,7 +211,7 @@ function modUtils.getConfigHandler(defaultSettings, modName)
             settings.saveConfig(newSetting)
         end
 
-        return {changed, newValue}
+        return { changed, newValue }
     end
 
     return settings

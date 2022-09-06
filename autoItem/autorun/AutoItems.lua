@@ -23,7 +23,7 @@ local langList = {
     "en-nn",
 },
 
-log.info(modName .. " loaded!")  -- Writes to game folder/re2_framework_log.txt
+    log.info(modName .. " loaded!") -- Writes to game folder/re2_framework_log.txt
 modUtils.info("Does the same as above, but puts [MODUTILS] at the beginning of the line, allowing you to find your logs among other logs easier")
 
 local settings = modUtils.getConfigHandler({
@@ -51,26 +51,30 @@ language.init(settings)
 
 local foodList = {
     -- [itemId] = {title, types, effectId, {{buffFieldName, buffFieldValue}, .. }}
-	[1] = {68157917, "Demondrug", {0}, 110, {{"_AtkUpAlive", "_DemondrugAtkUp", nil}}},
-	[2] = {68157918, "MegaDemondrug", {0}, 110, {{"_AtkUpAlive", "_GreatDemondrugAtkUp", nil}}},
-	[3] = {68157922, "Armorskin", {0}, 110, {{"_DefUpAlive", "_ArmorSkinDefUp", nil}}},
-	[4] = {68157923, "MegaArmorskin", {0}, 110, {{"_DefUpAlive" , "_GreatArmorSkinDefUp", nil}}},
-	[5] = {68157919, "MightSeed", {0}, 110, {{"_AtkUpBuffSecond", "_MightSeedAtkUp", nil}, {"_AtkUpBuffSecondTimer", "_MightSeedTimer", 60}}},
-	[6] = {68157920, "DemonPowder", {0}, 110, {{"_AtkUpItemSecond", "_DemondrugPowderAtkUp", nil}, {"_AtkUpItemSecondTimer", "_DemondrugPowderTimer", 60}}},
-	[7] = {68157924, "AdamantSeed", {0}, 110, {{"_DefUpBuffSecond", "_AdamantSeedDefUp", nil}, {"_DefUpBuffSecondTimer", "_AdamantSeedTimer", 60}}},
-	[8] = {68157925, "HardshellPowder", {0}, 110, {{"_DefUpItemSecond", "_ArmorSkinPowderDefUp", nil}, {"_DefUpItemSecondTimer", "_ArmorSkinPowderTimer", 60}}},
-	[10] = {68157909, "GourmetFish", {0}, 100, {{"_FishRegeneEnableTimer", "_WellDoneFishEnableTimer", 60}}},
-	[11] = {68157911, "Immunizer", {0}, 102, {{"_VitalizerTimer", "_VitalizerTimer", 60}}},
-	[9] = {68157913, "DashJuice", {0, 3}, 102, {{"_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 60}}},
+    [1] = { 68157917, "Demondrug", { 0 }, 110, { { "_AtkUpAlive", "_DemondrugAtkUp", nil } } },
+    [2] = { 68157918, "MegaDemondrug", { 0 }, 110, { { "_AtkUpAlive", "_GreatDemondrugAtkUp", nil } } },
+    [3] = { 68157922, "Armorskin", { 0 }, 110, { { "_DefUpAlive", "_ArmorSkinDefUp", nil } } },
+    [4] = { 68157923, "MegaArmorskin", { 0 }, 110, { { "_DefUpAlive", "_GreatArmorSkinDefUp", nil } } },
+    [5] = { 68157919, "MightSeed", { 0 }, 110,
+        { { "_AtkUpBuffSecond", "_MightSeedAtkUp", nil }, { "_AtkUpBuffSecondTimer", "_MightSeedTimer", 60 } } },
+    [6] = { 68157920, "DemonPowder", { 0 }, 110,
+        { { "_AtkUpItemSecond", "_DemondrugPowderAtkUp", nil }, { "_AtkUpItemSecondTimer", "_DemondrugPowderTimer", 60 } } },
+    [7] = { 68157924, "AdamantSeed", { 0 }, 110,
+        { { "_DefUpBuffSecond", "_AdamantSeedDefUp", nil }, { "_DefUpBuffSecondTimer", "_AdamantSeedTimer", 60 } } },
+    [8] = { 68157925, "HardshellPowder", { 0 }, 110,
+        { { "_DefUpItemSecond", "_ArmorSkinPowderDefUp", nil }, { "_DefUpItemSecondTimer", "_ArmorSkinPowderTimer", 60 } } },
+    [10] = { 68157909, "GourmetFish", { 0 }, 100, { { "_FishRegeneEnableTimer", "_WellDoneFishEnableTimer", 60 } } },
+    [11] = { 68157911, "Immunizer", { 0 }, 102, { { "_VitalizerTimer", "_VitalizerTimer", 60 } } },
+    [9] = { 68157913, "DashJuice", { 0, 3 }, 102, { { "_StaminaUpBuffSecondTimer", "_StaminaUpBuffSecond", 60 } } },
 
-    [12] = {0, "Whetstone", {1}, -1},
-    [13] = {68157445, "MaxPotion", {2}, 100},
-    [14] = {68157912, "Ration", {3}, -1},
+    [12] = { 0, "Whetstone", { 1 }, -1 },
+    [13] = { 68157445, "MaxPotion", { 2 }, 100 },
+    [14] = { 68157912, "Ration", { 3 }, -1 },
 }
-local polishTime = {30, 60, 90}
-local itemProlongerMultipliers = {1, 1.1, 1.25, 1.5}
+local polishTime = { 30, 60, 90 }
+local itemProlongerMultipliers = { 1, 1.1, 1.25, 1.5 }
 
-for key,value in pairs(foodList) do
+for key, value in pairs(foodList) do
     local foodKey = key
     local itemName = value[2]
     --log.debug(tostring(foodKey))
@@ -90,8 +94,8 @@ local function getQuestType(questManager)
     if not questManager then
         questManager = getQuestManager()
     end
-    if not questManager  then
-       return nil
+    if not questManager then
+        return nil
     end
     return modUtils.getSingletonField(questManager, "_QuestType")
 end
@@ -100,34 +104,34 @@ local function getQuestStatus(questManager)
     if not questManager then
         questManager = getQuestManager()
     end
-    if not questManager  then
-       return nil
+    if not questManager then
+        return nil
     end
     return modUtils.getSingletonField(questManager, "_QuestStatus")
 end
 
 local function getStaminaBuffCage()
-	local stamina = 0;
-	local EquipDataManager = sdk.get_managed_singleton("snow.data.EquipDataManager");
-	local ContentsIdDataManager = sdk.get_managed_singleton("snow.data.ContentsIdDataManager");
-	local EquipList = EquipDataManager:get_field("<EquipDataList>k__BackingField"):get_elements();
-	local buffCage = ContentsIdDataManager:get_field("_NormalData");
-	local buffCageList = buffCage:get_field("_BaseUserData"):get_field("_Param"):get_elements()
-	local getLvBuffCageData = EquipList[8]:call("getLvBuffCageData");
-	local id = getLvBuffCageData:call("get_Id");
-	local name = getLvBuffCageData:call("get_Name");
-	
-	for k, v in pairs(buffCageList) do
-		local data = buffCageList[k]
-		local dataId = data:get_field("_Id")
-		local buffLimit = data:get_field("_StatusBuffLimit"):get_elements()
-		
-		if id == dataId then
-			stamina = buffLimit[2]:get_field("mValue")
-		end
-	end
-	
-	return (stamina + 150) * 30;
+    local stamina = 0;
+    local EquipDataManager = sdk.get_managed_singleton("snow.data.EquipDataManager");
+    local ContentsIdDataManager = sdk.get_managed_singleton("snow.data.ContentsIdDataManager");
+    local EquipList = EquipDataManager:get_field("<EquipDataList>k__BackingField"):get_elements();
+    local buffCage = ContentsIdDataManager:get_field("_NormalData");
+    local buffCageList = buffCage:get_field("_BaseUserData"):get_field("_Param"):get_elements()
+    local getLvBuffCageData = EquipList[8]:call("getLvBuffCageData");
+    local id = getLvBuffCageData:call("get_Id");
+    local name = getLvBuffCageData:call("get_Name");
+
+    for k, v in pairs(buffCageList) do
+        local data = buffCageList[k]
+        local dataId = data:get_field("_Id")
+        local buffLimit = data:get_field("_StatusBuffLimit"):get_elements()
+
+        if id == dataId then
+            stamina = buffLimit[2]:get_field("mValue")
+        end
+    end
+
+    return (stamina + 150) * 30;
 end
 
 local function increaseStamina(player)
@@ -135,13 +139,13 @@ local function increaseStamina(player)
     local stamina = player:get_field("_stamina");
     local staminaMax = player:get_field("_staminaMax");
     local initMax = staminaMax
-    
+
     if getStaminaBuffCage() < (stamina + 1500) then
         stamina = getStaminaBuffCage();
     else
         stamina = (stamina + 1500);
     end
-    
+
     if getStaminaBuffCage() < (staminaMax + 1500) then
         staminaMax = getStaminaBuffCage();
     else
@@ -155,15 +159,16 @@ end
 
 local function hasItemInPouch(itemId)
     -- get inventory --
-	local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
-	local inventory = DataManager:get_field("_ItemPouch"):get_field("<VirtualSortInventoryList>k__BackingField"):get_elements();
-	local inventoryList = inventory[1]:get_field("mItems"):get_elements();
+    local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
+    local inventory = DataManager:get_field("_ItemPouch"):get_field("<VirtualSortInventoryList>k__BackingField"):
+        get_elements();
+    local inventoryList = inventory[1]:get_field("mItems"):get_elements();
     --log.debug('inventory length' .. #inventoryList)
     for index = 1, #inventoryList do
         local loopItem = inventoryList[index];
         local pouchitemId = loopItem:call("getItemId");
         local quantity = loopItem:call("getNum")
-        
+
         --log.debug('inventory item: id = ' .. pouchitemId .. '; quantity = ' .. quantity)
         if pouchitemId == itemId and quantity > 0 then
             return true
@@ -186,17 +191,18 @@ local function applyBuff(foodKey, buffObject, overwrite)
     local buffEffectId = buffObject[4]
     local buffArray = buffObject[5]
     --log.debug('trying to apply buff: ' .. buffTitle)
-    
-    -- these are useless for now, but I might implement an optional inventory usage feature later, so I'll leave it in.
-	local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
-	local inventory = DataManager:get_field("_ItemPouch"):get_field("<VirtualSortInventoryList>k__BackingField"):get_elements();
-	local NomalInventoryListData = inventory[1]:get_field("mItems"):get_elements();
 
-	local playerDataManager = sdk.get_managed_singleton("snow.player.PlayerManager");
-	local PlayerIndex = playerDataManager:call("findMasterPlayer"):call("getPlayerIndex");
-	local playerList = playerDataManager:get_field("<PlayerData>k__BackingField"):get_elements();
-	local player = playerDataManager:call("findMasterPlayer");
-	local dataList = playerDataManager:get_field("_PlayerUserDataItemParameter");
+    -- these are useless for now, but I might implement an optional inventory usage feature later, so I'll leave it in.
+    local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
+    local inventory = DataManager:get_field("_ItemPouch"):get_field("<VirtualSortInventoryList>k__BackingField"):
+        get_elements();
+    local NomalInventoryListData = inventory[1]:get_field("mItems"):get_elements();
+
+    local playerDataManager = sdk.get_managed_singleton("snow.player.PlayerManager");
+    local PlayerIndex = playerDataManager:call("findMasterPlayer"):call("getPlayerIndex");
+    local playerList = playerDataManager:get_field("<PlayerData>k__BackingField"):get_elements();
+    local player = playerDataManager:call("findMasterPlayer");
+    local dataList = playerDataManager:get_field("_PlayerUserDataItemParameter");
 
     --handle itemProlonger skill --
     local itemProlongerLevel = playerDataManager:call("getHasPlayerSkillLvInQuestAndTrainingArea", PlayerIndex, 88)
@@ -209,9 +215,9 @@ local function applyBuff(foodKey, buffObject, overwrite)
     local freeMealLevel = playerDataManager:call("getHasPlayerSkillLvInQuestAndTrainingArea", PlayerIndex, 90)
     local isFree = false
     if (freeMealLevel > 0 and settings.data.consumeItems) then
-        math.randomseed(os.clock()*100000000000)
+        math.randomseed(os.clock() * 100000000000)
         local rng = math.random(100)
-        local freeMealPercents = {10, 25, 45}
+        local freeMealPercents = { 10, 25, 45 }
         local activePercent = freeMealPercents[freeMealLevel]
         if (activePercent > rng) then
             isFree = true
@@ -259,13 +265,13 @@ local function applyBuff(foodKey, buffObject, overwrite)
     end
 
     if (dracahnUtil.arrayContains(buffTypes, 2)) then -- Healing Item --
-        didApply = true        
+        didApply = true
         local max = playerList[PlayerIndex + 1]:get_field("_vitalMax")
 
         local maxFloat = max + .0
         playerList[PlayerIndex + 1]:set_field("_r_Vital", max)
         playerList[PlayerIndex + 1]:call("set__vital", maxFloat)
-    end 
+    end
 
     if (dracahnUtil.arrayContains(buffTypes, 0)) then -- Buff Item --
         for key, value in pairs(buffArray) do
@@ -290,7 +296,7 @@ local function AutoConsume()
     -- get data
     local questStatus = getQuestStatus()
     local inQuest = questStatus == 2 -- 2 means the player is in a quest
-    
+
     -- if I'm in a quest
     if (inQuest and not endQuest) then
         local inBattle = modUtils.checkIfInBattle()
@@ -317,9 +323,9 @@ local function AutoConsume()
 
         -- determine 'start of combat'
         if (inBattle) then -- if we're in battle
-            if (startCombatHolder) then -- if we have not activated the 'start of combat' items 
-                if (death) then 
-                    death = false 
+            if (startCombatHolder) then -- if we have not activated the 'start of combat' items
+                if (death) then
+                    death = false
                     spawnVar = true
                 end -- turn the death flag off once you get back in combat
                 activateLevel = 3 -- set actiavet level to 3
@@ -331,7 +337,7 @@ local function AutoConsume()
 
         -- determine 'once per quest'
         if (spawnVar and not death) then -- if we have not activated the once per quest items
-            activateLevel = 2  -- set the activate level to 2
+            activateLevel = 2 -- set the activate level to 2
             spawnVar = false -- mark that we have activate the 'once per quest' items
         end -- else we've already activated the 'once per quest' items
 
@@ -339,26 +345,26 @@ local function AutoConsume()
         dbg.activateLevel = activateLevel
 
         local activateEffects = {}
-        for key,value in pairs(settings.data.userChoices) do
+        for key, value in pairs(settings.data.userChoices) do
             if (value >= activateLevel) then
-                activateEffects[#activateEffects+1] = foodList[key]
+                activateEffects[#activateEffects + 1] = foodList[key]
             end
         end
 
         dbg.actiavetEffects = activateEffects
         local appliedBuffs = {}
-        for key,value in pairs(activateEffects) do
+        for key, value in pairs(activateEffects) do
             local applied, wasFree = applyBuff(key, value, activateLevel ~= 5)
             if (applied) then
                 local messageText = value[2]
                 if wasFree then messageText = messageText .. "(free meal)" end
-                appliedBuffs[#appliedBuffs+1] = messageText
+                appliedBuffs[#appliedBuffs + 1] = messageText
             end
         end
 
         if (settings.data.message and #appliedBuffs > 0) then
-            local message = "<COL RED>".. language.get("message.title") .. "</COL>";
-            for key,value in pairs(appliedBuffs) do
+            local message = "<COL RED>" .. language.get("message.title") .. "</COL>";
+            for key, value in pairs(appliedBuffs) do
                 message = message .. "\n" .. value
             end
             local chatManager = sdk.get_managed_singleton("snow.gui.ChatManager");
@@ -376,7 +382,7 @@ end)
 
 -- Event callback hook for behaviour updates
 re.on_pre_application_entry("UpdateBehavior", function() -- unnamed/inline function definition
-	local questManager = sdk.get_managed_singleton("snow.QuestManager");
+    local questManager = sdk.get_managed_singleton("snow.QuestManager");
     if not questManager then
         questManager = sdk.get_managed_singleton("snow.QuestManager");
         if not questManager then
@@ -396,43 +402,45 @@ re.on_pre_application_entry("UpdateBehavior", function() -- unnamed/inline funct
 end)
 
 sdk.hook(sdk.find_type_definition("snow.QuestManager"):get_method("onQuestEnd"),
-function(args)
-	spawnVar = true;
-end,
-function(retval)
-	return retval
-end
+    function(args)
+        spawnVar = true;
+    end,
+    function(retval)
+        return retval
+    end
 );
 
 sdk.hook(sdk.find_type_definition("snow.QuestManager"):get_method("notifyDeath"),
-function(args)
-	death = true;
-end,
-function(retval)
-	return retval
-end
+    function(args)
+        death = true;
+    end,
+    function(retval)
+        return retval
+    end
 );
 
 local function uiDetails()
     local changedMessage, toggleMessage = imgui.checkbox(language.get("config.message"), settings.data.message)
     settings.handleChange(changedMessage, toggleMessage, "message")
-    local changedConsumeItems, toggleConsumeItems = imgui.checkbox(language.get("config.consumeItems"), settings.data.consumeItems)
+    local changedConsumeItems, toggleConsumeItems = imgui.checkbox(language.get("config.consumeItems"),
+        settings.data.consumeItems)
     settings.handleChange(changedConsumeItems, toggleConsumeItems, "consumeItems")
     imgui.text(language.get("descriptions.key"))
-    
+
     local changed = false
 
     local triggerLabels = language.get("triggerLabels")
-    imgui.text(tostring(triggerLabels[1]))
+    --imgui.text(tostring(triggerLabels[1]))
 
-    for key,value in pairs(foodList) do
+    for key, value in pairs(foodList) do
         local foodKey = key
         local effectName = value[2]
-        changed, settings.data.userChoices[foodKey] = imgui.slider_int(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, triggerLabels[settings.data.userChoices[foodKey]])
+        changed, settings.data.userChoices[foodKey] = imgui.slider_int(language.get("foods." .. effectName),
+            settings.data.userChoices[foodKey], 1, 5, triggerLabels[settings.data.userChoices[foodKey]])
         settings.handleChange(changed, settings.data.userChoices, "userChoices")
     end
 
-    if imgui.tree_node(language.get("debug")) then
+    if imgui.tree_node(language.get("descriptions.debug")) then
         if imgui.button("Toggle spawnVar") then
             spawnVar = not spawnVar
         end
@@ -460,11 +468,13 @@ local function modUiDetails(modUi)
     modUi.Label(language.get("modUi.draw"));
     modUi.Label(language.get("modUi.always"));
     modUi.Header(language.get("modUi.items"));
-    for key,value in pairs(foodList) do
+    for key, value in pairs(foodList) do
         local foodKey = key
         local effectName = value[2]
         local changed;
-        changed, settings.data.userChoices[foodKey] = modUi.Slider(language.get("foods." .. effectName), settings.data.userChoices[foodKey], 1, 5, language.get("modUi.")"1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
+        changed, settings.data.userChoices[foodKey] = modUi.Slider(language.get("foods." .. effectName),
+            settings.data.userChoices[foodKey], 1, 5,
+            language.get("modUi.") "1 = off, 2 = On Quest Start \r\n3 = On Combat Start, 4 = On WeaponDraw\r\n5 = Always")
         settings.handleChange(changed, settings.data.userChoices, "userChoices")
     end
 
