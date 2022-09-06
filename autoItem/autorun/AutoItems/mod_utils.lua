@@ -40,7 +40,7 @@ function modUtils.getEnumMap(enumTypeName)
     return map
 end
 
-function modUtils.info(text) log.info("[MODUTILS.autoItems] " .. text) end
+function modUtils.info(text) log.info("[MODUTILS.AutoItems] " .. text) end
 
 function modUtils.getQuestStatus(questManager)
     if not questManager then
