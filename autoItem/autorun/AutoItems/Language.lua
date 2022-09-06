@@ -8,7 +8,7 @@ end
 
 -- Loads all languages from the language folder
 function language.load_languages()
-    local files = fs.glob([[AutoItems\\Languages\\.*json]])
+    local files = fs.glob([[[aA]utoItems\\Languages\\.*json]])
     if files == nil then return end
     for i = 1, #files do
         local file = files[i]
@@ -21,7 +21,7 @@ end
 
 function language.read_languages()
     local languages = {}
-    local files = fs.glob([[AutoItems\\Languages\\.*json]])
+    local files = fs.glob([[[aA]utoItems\\Languages\\.*json]])
     if files == nil then return end
     languages.files = files
     for i = 1, #files do

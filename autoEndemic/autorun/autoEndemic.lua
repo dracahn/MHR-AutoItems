@@ -1,4 +1,4 @@
-local modName = "AutoEndemic"
+local modName = "autoEndemic"
 local version = "1.0.0"
 local author = "dracahn"
 local dbg = {}
@@ -49,7 +49,7 @@ local function endemicNamesForDropDown(endemicList)
     return ddList
 end
 
-local function AutoEndemic()
+local function autoEndemic()
     local questStatus = modUtils.getQuestStatus()
     local inQuest = questStatus == 2 -- 2 means the player is in a quest
     if not inQuest then
@@ -131,7 +131,7 @@ re.on_draw_ui(function()
             end
 
             if (imgui.button("set cage")) then
-                AutoEndemic()
+                autoEndemic()
             end
 
             imgui.text("settings.data: " .. json.dump_string(settings.data))
@@ -158,5 +158,5 @@ re.on_draw_ui(function()
 end)
 
 re.on_pre_application_entry("UpdateBehavior", function()
-    AutoEndemic()
+    autoEndemic()
 end)
