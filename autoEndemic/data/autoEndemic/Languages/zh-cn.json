@@ -1,0 +1,54 @@
+{
+  "Title": "自动使用道具",
+  "author": "dracahn",
+  "Translator": "birdzhou",
+  "window": {
+    "toggle": "自动使用道具",
+    "language": "语言: "
+  },
+  "descriptions": {
+    "short": "道具会在满足对应条件时自动使用",
+    "key": "道具会在满足对应条件时自动使用.\r\n'关闭': 从不自动使用\r\n'出生': 在进入任务或猫车后使用\r\n'进入战斗': 在进入战斗后使用 (或在睡眠/昏厥/御龙后使用)\r\n'拔出武器': 拔刀后使用\r\n'保持buff': 道具持续时间结束后使用",
+    "debug": "Debug信息 (发送此信息的截图到bug反馈区)",
+    "jsonWarning": "错误: JSON文件不可用 (REFramework版本过低). 设置无法保存."
+  },
+  "config": {
+    "enabled": "启用",
+    "message": "启用消息通知",
+    "offlineOnly": "仅单人时生效",
+    "consumeItems": "消耗背包中的道具"
+  },
+  "message": {
+    "title": "自动使用:"
+  },
+  "triggerLabels": ["关闭", "出生", "进入战斗", "拔出武器", "保持buff"],
+  "foods": {
+    "Demondrug": "鬼人药",
+    "MegaDemondrug": "鬼人药G",
+    "Armorskin": "硬化药",
+    "MegaArmorskin": "硬化药G",
+    "MightSeed": "怪力种子",
+    "DemonPowder": "鬼人粉尘",
+    "AdamantSeed": "忍耐种子",
+    "HardshellPowder": "硬化粉尘",
+    "GourmetFish": "烤熟的鱼",
+    "Immunizer": "活力剂",
+    "DashJuice": "强走药",
+    "Whetstone": "砥石",
+    "MaxPotion": "秘药",
+    "Ration": "携带食料"
+  },
+  "modUi": {
+    "modUiOutOfDate": "Please update mod menu API.",
+    "generalSettings": "一般设置",
+    "key": "Key",
+    "off": "1 = 关闭",
+    "spawn": "2 = 出生",
+    "combat": "3 = 进入战斗",
+    "draw": "4 = 拔出武器",
+    "always": "5 = 保持buff",
+    "items": "道具列表",
+    "credits": "Credits",
+    "modBy": "Mod By: "
+  }
+}
