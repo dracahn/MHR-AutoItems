@@ -54,6 +54,34 @@ function util.modUi(settings, language, details)
     local modUi = nil
     local DrawSlider
 
+        imgui.spacing()
+        imgui.text(version)
+        imgui.spacing()
+
+        imgui.end_window()
+    end
+end
+
+function util.IsModuleAvailable(name)
+    if package.loaded[name] then
+        return true
+    else
+        for _, searcher in ipairs(package.searchers or package.loaders) do
+            local loader = searcher(name)
+            if type(loader) == 'function' then
+                package.preload[name] = loader
+                return true
+            end
+        end
+        return false
+    end
+end
+
+function util.modUi(settings, language, details)
+    local apiPackageName = "ModOptionsMenu.ModMenuApi"
+    local modUi = nil
+    local DrawSlider
+
     if util.IsModuleAvailable(apiPackageName) then
         modUi = require(apiPackageName);
     end
