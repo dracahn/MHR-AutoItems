@@ -4,7 +4,7 @@ local jsonUtils = json
 local function getType(name) return sdk.find_type_definition(name) end
 
 local function getSingletonData(name)
-    return {sdk.get_managed_singleton(name), getType(name)}
+    return { sdk.get_managed_singleton(name), getType(name) }
 end
 
 local function getSingletonField(singleton, name)
@@ -13,7 +13,7 @@ local function getSingletonField(singleton, name)
 end
 
 local function callSingletonFunc(singleton, name, ...)
-    local args = {...}
+    local args = { ... }
     local singletonRef, typedef = table.unpack(singleton)
     return singletonRef:call(name, table.unpack(args))
 end
@@ -54,7 +54,7 @@ local function checkIfInBattle()
 
     local currentMusicType = getSingletonField(musicManager, "_FightBGMType")
     local currentBattleState = getSingletonField(musicManager,
-                                                 "_CurrentEnemyAction")
+        "_CurrentEnemyAction")
 
     local musicMixManager = getSingletonData("snow.wwise.WwiseMixManager")
     local currentMixUsed = getSingletonField(musicMixManager, "_Current")
@@ -65,13 +65,13 @@ local function checkIfInBattle()
     local currentQuestStatus = getSingletonField(questManager, "_QuestStatus")
 
     local inBattle = currentBattleState == 3 -- Fighting a monster
-    or currentMixUsed == 37 -- Fighting a wave of monsters
-    or currentMixUsed == 10 -- Stronger battle music mix is being used
-    or currentMixUsed == 31 -- Used in some arena battles
-    or currentQuestType == 64 -- Fighting in the arena (Utsushi)
+        or currentMixUsed == 37 -- Fighting a wave of monsters
+        or currentMixUsed == 10 -- Stronger battle music mix is being used
+        or currentMixUsed == 31 -- Used in some arena battles
+        or currentQuestType == 64 -- Fighting in the arena (Utsushi)
 
     local isQuestComplete = currentQuestStatus == 3 -- Completed the quest
-    or currentQuestStatus == 0 -- Not in a quest
+        or currentQuestStatus == 0 -- Not in a quest
 
     return inBattle and not isQuestComplete
 end
@@ -90,17 +90,17 @@ local function checkIfInMultiplayer() return getPlayerCount() > 1 end
 -- Enum maps should be obtained at the top level because they won't ever change while the game runs
 local mixEnumMap = getEnumMap("snow.wwise.WwiseMixManager.Mix")
 local fightBgmEnumMap = getEnumMap(
-                            "snow.wwise.WwiseEnemyMonitoredParameters.FightBGMType")
+    "snow.wwise.WwiseEnemyMonitoredParameters.FightBGMType")
 local enemyActionEnumMap =
-    getEnumMap("snow.wwise.WwiseMusicManager.EnemyAction")
+getEnumMap("snow.wwise.WwiseMusicManager.EnemyAction")
 local questTypeEnumMap = getEnumMap("snow.quest.QuestType")
 local questStatusEnumMap = getEnumMap("snow.QuestManager.Status")
 
 local function debugPrintInputs(playerInput)
     if playerInput == nil then
         playerInput =
-            sdk.get_managed_singleton("snow.player.PlayerManager"):call(
-                "findMasterPlayer"):call("get_RefPlayerInput")
+        sdk.get_managed_singleton("snow.player.PlayerManager"):call(
+            "findMasterPlayer"):call("get_RefPlayerInput")
     end
 
     local gotAnything = false
@@ -110,7 +110,7 @@ local function debugPrintInputs(playerInput)
             160) and (i ~= 30 and i ~= 146) and playerInput:call("isCmd", i) then
             gotAnything = true
             log.debug("is pressing : " ..
-                          tostring(commandEnumMap[i] .. " " .. tostring(i)))
+                tostring(commandEnumMap[i] .. " " .. tostring(i)))
         end
     end
     if gotAnything then log.debug("------") end
@@ -125,39 +125,39 @@ local function printDebugInfo()
         local musicMixManager = getSingletonData("snow.wwise.WwiseMixManager")
 
         local currentMusicType =
-            getSingletonField(musicManager, "_FightBGMType")
+        getSingletonField(musicManager, "_FightBGMType")
         local currentBattleState = getSingletonField(musicManager,
-                                                     "_CurrentEnemyAction")
+            "_CurrentEnemyAction")
 
         local currentMixUsed = getSingletonField(musicMixManager, "_Current")
         local currentQuestType = getSingletonField(questManager, "_QuestType")
         local currentQuestStatus = getSingletonField(questManager,
-                                                     "_QuestStatus")
+            "_QuestStatus")
         local numberOfPlayers = getSingletonField(questManager, "_TotalJoinNum")
         local playersSuffix = "players"
         if numberOfPlayers == 1 then playersSuffix = "player" end
 
         imgui.text("Detected as \"in battle\"? " ..
-                       (checkIfInBattle() and "Yes" or "No"))
+            (checkIfInBattle() and "Yes" or "No"))
         imgui.text("Detected as \"in multiplayer\"? " ..
-                       (checkIfInMultiplayer() and "Yes" or "No") .. " (" ..
-                       numberOfPlayers .. " " .. playersSuffix .. " in quest)")
+            (checkIfInMultiplayer() and "Yes" or "No") .. " (" ..
+            numberOfPlayers .. " " .. playersSuffix .. " in quest)")
         imgui.text("");
         imgui.text(
             "Current quest type: " .. questTypeEnumMap[currentQuestType] .. " (" ..
-                currentQuestType .. ")")
+            currentQuestType .. ")")
         imgui.text("Current quest status: " ..
-                       questStatusEnumMap[currentQuestStatus] .. " (" ..
-                       currentQuestStatus .. ")")
+            questStatusEnumMap[currentQuestStatus] .. " (" ..
+            currentQuestStatus .. ")")
         imgui.text("Current fight music type: " ..
-                       fightBgmEnumMap[currentMusicType] .. " (" ..
-                       currentMusicType .. ")")
+            fightBgmEnumMap[currentMusicType] .. " (" ..
+            currentMusicType .. ")")
         imgui.text(
             "Current music mix: " .. mixEnumMap[currentMixUsed] .. " (" ..
-                currentMixUsed .. ")")
+            currentMixUsed .. ")")
         imgui.text("Current battle state: " ..
-                       enemyActionEnumMap[currentBattleState] .. " (" ..
-                       currentBattleState .. ")")
+            enemyActionEnumMap[currentBattleState] .. " (" ..
+            currentBattleState .. ")")
     end)
     log.info(b)
 end
@@ -220,7 +220,7 @@ local function getConfigHandler(defaultSettings, modName)
     end
 
     function settings.imgui(property, imguiFunc, ...)
-        local args = {...}
+        local args = { ... }
         local changed, newValue = imguiFunc(args[1], settings.data[property], table.unpack(args, 2))
         if changed == nil or newValue == nil then
             error("settings.imgui was called with an invalid imgui func")
@@ -231,7 +231,7 @@ local function getConfigHandler(defaultSettings, modName)
             settings.saveConfig(newSetting)
         end
 
-        return {changed, newValue}
+        return { changed, newValue }
     end
 
     return settings
