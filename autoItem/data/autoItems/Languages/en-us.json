@@ -15,7 +15,9 @@
     },
     "config": {
         "enabled": "Enable",
-        "message": "Message"
+        "message": "Message",
+        "offlineOnly": "Offline Only",
+        "consumeItems": "Consume Items"
     },
     "message": {
         "title": "Auto Consumed:"

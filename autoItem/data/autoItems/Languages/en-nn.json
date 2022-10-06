@@ -12,7 +12,9 @@
     },
     "config": {
         "enabled": "nn",
-        "message": "nn"
+        "message": "nn",
+        "offlineOnly": "nn",
+        "consumeItems": "nn"
     },
     "message": {
         "title": "nn:"

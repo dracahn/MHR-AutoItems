@@ -6,7 +6,8 @@
         "description": "Select what Hunting Helpers you want added to your Helper Cage at the start of the next quest:"
     },
     "config": {
-        "enable": "enable"
+        "enable": "enable",
+        "language": "language"
     },
     "endemicLifeIds": [
         67108864,

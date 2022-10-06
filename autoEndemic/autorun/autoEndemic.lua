@@ -1,4 +1,4 @@
-local modName = "AutoEndemic"
+local modName = "autoEndemic"
 local version = "1.0.0"
 local author = "dracahn"
 local dbg = {}
@@ -32,8 +32,8 @@ language.init(settings)
 local function getEndemicList()
     local list = {}
     local names = language.get("endemicLife")
-    for key,value in pairs(language.get("endemicLifeIds")) do
-        list[key] = {id = value, name = names[tostring(value)]}
+    for key, value in pairs(language.get("endemicLifeIds")) do
+        list[key] = { id = value, name = names[tostring(value)] }
     end
     return list
 end
@@ -43,13 +43,13 @@ local function endemicNamesForDropDown(endemicList)
 
     local ddList = {}
     for key, value in pairs(endemicList) do
-        ddList[#ddList+1] = value.name
+        ddList[#ddList + 1] = value.name
     end
 
     return ddList
 end
 
-local function AutoEndemic()
+local function autoEndemic()
     local questStatus = modUtils.getQuestStatus()
     local inQuest = questStatus == 2 -- 2 means the player is in a quest
     if not inQuest then
@@ -59,22 +59,23 @@ local function AutoEndemic()
     if (not settings.data.enabled or not spawnVar) then return end
 
     spawnVar = false
-            
+
     local endemicList = getEndemicList()
     local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
-    local ecPouchItems = DataManager:get_field("<Ec_ItemPouch>k__BackingField"):get_field("<InventoryDataList>k__BackingField"):get_elements(); -- snow.data.ItemInventoryData[]
+    local ecPouchItems = DataManager:get_field("<Ec_ItemPouch>k__BackingField"):get_field("<InventoryDataList>k__BackingField")
+        :get_elements(); -- snow.data.ItemInventoryData[]
     for i = 1, 5, 1 do
         local currentSetting = settings.data.ecItemPouch[i]
-        if (currentSetting > 1) then 
+        if (currentSetting > 1) then
             local itemId = tonumber(endemicList[currentSetting].id)
             ecPouchItems[i]:call("set", itemId, 1, true)
-            
+
             if itemId == 69206037 then -- Needs to be reset otherwise it will be stuck in the "consumed" state
                 local creature_manager = sdk.get_managed_singleton("snow.envCreature.EnvironmentCreatureManager")
                 local inputManager = sdk.get_managed_singleton("snow.StmInputManager")
                 local inGameInputDevice = inputManager:get_field("_InGameInputDevice")
                 local playerInput = inGameInputDevice:get_field("_pl_input")
-                local playerBase =  playerInput:get_field("RefPlayer")
+                local playerBase = playerInput:get_field("RefPlayer")
                 local playerIndex = playerBase:get_field("_PlayerIndex")
                 creature_manager:call("addEc057GetCount", playerIndex)
             end
@@ -97,13 +98,18 @@ re.on_draw_ui(function()
         settings.data.isWindowOpen = imgui.begin_window(modName, settings.data.isWindowOpen, 0)
         settings.imgui("enabled", imgui.checkbox, language.get("config.enable"))
         imgui.spacing()
-        -- local changedSpecialWirebug, specialWirebug = imgui.slider_int(language.get("config.specialWirebug"), settings.data.)
-        
-        
+        local langChange, newVal = imgui.combo(language.get("enabled"), settings.data.language.current, langList)
+        settings.data.language.current = langList[newVal]
+        settings.handleChange(langChange, settings.data.language, "language")
+        imgui.spacing()
+        imgui.spacing()
+
+
         local changed = false
         for i = 1, 5, 1 do
             local loopChange
-            loopChange, settings.data.ecItemPouch[i] = imgui.combo(tostring(i), settings.data.ecItemPouch[i],endemicNamesForDropDown)
+            loopChange, settings.data.ecItemPouch[i] = imgui.combo(tostring(i), settings.data.ecItemPouch[i],
+                endemicNamesForDropDown)
             changed = loopChange or changed
         end
         settings.handleChange(changed, settings.data.ecItemPouch, "ecItemPouch")
@@ -115,7 +121,8 @@ re.on_draw_ui(function()
             end
 
             local DataManager = sdk.get_managed_singleton("snow.data.DataManager");
-            local ecPouchItems = DataManager:get_field("<Ec_ItemPouch>k__BackingField"):get_field("<InventoryDataList>k__BackingField"):get_elements(); -- snow.data.ItemInventoryData[]
+            local ecPouchItems = DataManager:get_field("<Ec_ItemPouch>k__BackingField"):get_field("<InventoryDataList>k__BackingField")
+                :get_elements(); -- snow.data.ItemInventoryData[]
             imgui.text("current ecPouch:")
             for i = 1, 5, 1 do
                 local ecPouchItem = ecPouchItems[i]
@@ -123,13 +130,13 @@ re.on_draw_ui(function()
                 imgui.text("  " .. i .. ": " .. ecPouchItemId)
             end
 
-            if (imgui.button("set ec1")) then 
+            if (imgui.button("set ec1")) then
                 --ecPouchItems[1]:call("setId", 69206016)
                 ecPouchItems[1]:call("set", 69206016, 1, true)
             end
 
-            if (imgui.button("set cage")) then 
-                AutoEndemic()
+            if (imgui.button("set cage")) then
+                autoEndemic()
             end
 
             imgui.text("settings.data: " .. json.dump_string(settings.data))
@@ -156,5 +163,5 @@ re.on_draw_ui(function()
 end)
 
 re.on_pre_application_entry("UpdateBehavior", function()
-    AutoEndemic()
+    autoEndemic()
 end)
