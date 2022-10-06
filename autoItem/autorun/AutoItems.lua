@@ -21,6 +21,8 @@ local language = require(modName .. "/Language")
 local langList = {
     "en-us",
     "en-nn",
+    "zh-cn",
+    "zh-tw",
 },
 
     log.info(modName .. " loaded!") -- Writes to game folder/re2_framework_log.txt
@@ -35,6 +37,7 @@ local settings = modUtils.getConfigHandler({
     userChoices = {},
     language = {
         current = "en-us",
+        currentIndex = 1,
         languages = {},
         sorted = {},
     }

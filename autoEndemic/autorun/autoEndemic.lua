@@ -98,6 +98,11 @@ re.on_draw_ui(function()
         settings.data.isWindowOpen = imgui.begin_window(modName, settings.data.isWindowOpen, 0)
         settings.imgui("enabled", imgui.checkbox, language.get("config.enable"))
         imgui.spacing()
+        local langChange, newVal = imgui.combo(language.get("enabled"), settings.data.language.current, langList)
+        settings.data.language.current = langList[newVal]
+        settings.handleChange(langChange, settings.data.language, "language")
+        imgui.spacing()
+        imgui.spacing()
 
 
         local changed = false

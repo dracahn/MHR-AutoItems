@@ -1,0 +1,45 @@
+{
+    "Title": "nn",
+    "Translator": "nn",
+    "window": {
+        "toggle": "nn"
+    },
+    "descriptions": {
+        "disclaimer": "nn",
+        "key": "nn",
+        "debug": "nn",
+        "jsonWarning": "nn"
+    },
+    "config": {
+        "enabled": "nn",
+        "message": "nn",
+        "offlineOnly": "nn",
+        "consumeItems": "nn"
+    },
+    "message": {
+        "title": "nn:"
+    },
+    "triggerLabels": [
+        "nn", 
+        "nn", 
+        "nn", 
+        "nn", 
+        "nn"
+    ],
+    "foods": {
+        "Demondrug":"nn",
+        "MegaDemondrug":"nn",
+        "Armorskin":"nn",
+        "MegaArmorskin":"nn",
+        "MightSeed":"nn",
+        "DemonPowder":"nn",
+        "AdamantSeed":"nn",
+        "HardshellPowder":"nn",
+        "GourmetFish":"nn",
+        "Immunizer":"nn",
+        "DashJuice":"nn",
+        "Whetstone":"nn",
+        "MaxPotion":"nn",
+        "Ration":"nn"
+    }
+}
