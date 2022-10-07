@@ -1,0 +1,18 @@
+Auto use items under certain conditions - like demondrug on quest start
+在设定的情景下自动使用消耗品-例如在任务开始时自动使用鬼人药等
+
+This mod allows you to have certain items and effects occur on certain triggers.  Personally I'll be putting most everything on "Start of Combat" so I don't have to re-eat 10 foods between each combat segment, while still making time to re-apply buffs mid fight.  I find that this saves time while not affecting actual combat much.
+这个模组可以实现在设定的条件下自动使用消耗品。例如我将大部分物品设定为"战斗开始"时使用，这样我就不需要每次都在进入战斗前重新嗑个十来种药，打起来只需要重新续上断掉的buff即可。这样既节省时间也不影响实战。
+
+The 4 triggers I currently have are:
+Never: item will never trigger by this mod - you can still manually use the item
+OnSpawn: item will be used when you start a quest or when you die and re-spawn
+StartOfCombat: item will be used when the player enters combat
+Weapon Draw: Item will be used whenever the player draws their weapon (this will be a bit wonky for longsword)
+Always: Item will be used when the previous effect ends or there is a need.  This is a bit spammy with potions and whetstones.
+现在有4种设定条件:
+1.关闭:从不自动自动使用该物品-你仍然可以手动使用
+2.出生时使用:在进入任务或者死亡复活后重新使用该物品
+3.进入战斗时使用:在进入战斗时自动使用该物品
+4.拔出武器时使用:拔刀时自动使用该物品(这个设定对太刀来说不太稳定,大概是因为居合的原因)
+5.保持buff:在物品持续时间结束或者有需要时自动使用该物品(秘药会不停吃,砥石=无限耐久度)
